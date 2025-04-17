@@ -1,8 +1,13 @@
+import AppContentLayout from '@/components/dashboard/content-layout'
 import React from 'react'
 
 function Admin() {
   return (
-    <div>Admin page</div>
+    <AppContentLayout header={
+      <div>Head</div>
+    }>
+      test
+    </AppContentLayout>
   )
 }
 

@@ -59,7 +59,7 @@ Modern developer portfolio with an integrated dashboard to manage projects, page
 
 ```bash
 git clone https://github.com/3bdulrahmanOthman/Portfolio-Dev.git
-cd your-repo-name
+cd Portfolio-Dev
 ```
 
 2. **Install dependencies**
