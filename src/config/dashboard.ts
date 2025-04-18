@@ -53,6 +53,11 @@ export const dashboardConfig: DashboardConfig = {
           icon: "box",
           items: [
             {
+              title: "All",
+              path: "/admin/projects",
+              icon: "boxes",
+            },
+            {
               title: "Add",
               path: "/admin/projects/add",
               icon: "boxPlus",

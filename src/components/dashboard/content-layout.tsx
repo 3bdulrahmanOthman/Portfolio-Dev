@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { SidebarTrigger } from "../ui/sidebar";
+import { ScrollArea } from "../ui/scroll-area";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -23,14 +24,14 @@ export default function AppContentLayout({
           <SidebarTrigger />
           {header}
         </div>
-        <div
+        <ScrollArea
           className={cn(
-            "overflow-auto w-full",
+            "w-full",
             height[headersNumber as keyof typeof height]
           )}
         >
           {children}
-        </div>
+        </ScrollArea>
       </div>
     </div>
   );
