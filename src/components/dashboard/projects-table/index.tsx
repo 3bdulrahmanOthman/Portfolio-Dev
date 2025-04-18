@@ -67,7 +67,7 @@ export function ProjectsTable({ promises }: ProjectTableProps) {
         table={table}
         actionBar={<ProjectTableActionBar table={table} />}
       >
-        <DataTableToolbar table={table} />
+        <DataTableToolbar table={table} className="items-center py-1 px-6"/>
       </DataTable>
 
       <ConfirmDeleteDialog

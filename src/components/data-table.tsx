@@ -27,13 +27,13 @@ export function DataTable<TData>({
 }: DataTableProps<TData>) {
   return (
     <div
-      className={cn("h-full w-full overflow-auto", className)}
+      className={cn("flex h-full w-full flex-col overflow-auto", className)}
       {...props}
     >
       {children}
-      <div className="h-full overflow-hidden border-y">
+      <div className="overflow-hidden border-y">
         <Table>
-          <TableHeader >
+           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -90,7 +90,7 @@ export function DataTable<TData>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex flex-col gap-2.5 my-auto py-1.5 px-6">
+      <div className="mt-auto border-t py-1.5 px-6">
         <DataTablePagination table={table} />
         {actionBar &&
           table.getFilteredSelectedRowModel().rows.length > 0 &&

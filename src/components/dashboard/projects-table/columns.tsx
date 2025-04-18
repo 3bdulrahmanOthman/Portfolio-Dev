@@ -182,7 +182,7 @@ export function projectsTableColumns({
     {
       id: "createdAt",
       accessorKey: "createdAt",
-      header: ({ column }) => (
+      header: ({ column }: { column: Column<Project, unknown> }) => (
         <DataTableColumnHeader column={column} title="Created At" />
       ),
       cell: ({ cell }) => formatDate(cell.getValue<Date>()),

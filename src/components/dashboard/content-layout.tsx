@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 import { SidebarTrigger } from "../ui/sidebar";
-import { ScrollArea } from "../ui/scroll-area";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -11,7 +10,7 @@ interface MainLayoutProps {
 export default function AppContentLayout({
   children,
   header,
-  headersNumber = 2,
+  headersNumber = 1,
 }: MainLayoutProps) {
   const height = {
     1: "h-[calc(100svh-40px)] md:h-[calc(100svh-56px)]",
@@ -24,14 +23,14 @@ export default function AppContentLayout({
           <SidebarTrigger />
           {header}
         </div>
-        <ScrollArea
+        <div
           className={cn(
             "w-full",
             height[headersNumber as keyof typeof height]
           )}
         >
           {children}
-        </ScrollArea>
+        </div>
       </div>
     </div>
   );
