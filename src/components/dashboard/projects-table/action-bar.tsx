@@ -19,11 +19,9 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { exportTableToCSV } from "@/lib/export";
-import { ProjectSchema } from "@/schemas";
-import { z } from "zod";
 import { deleteProjects, updateProjects } from "@/lib/actions/projects";
+import { Project } from '@/lib/validations/index';
 
-type Project = z.infer<typeof ProjectSchema>;
 type Action = "update-featured" | "export" | "delete";
 
 interface ProjectTableActionBarProps {

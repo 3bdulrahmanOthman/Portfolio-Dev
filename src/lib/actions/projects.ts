@@ -1,27 +1,72 @@
 "use server";
 
+import { Prisma } from "@prisma/client";
+import { prisma } from "../db/prisma";
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
 import { createSafeAction, type ActionState } from "@/lib/utils";
 import { ProjectSchema } from "@/schemas";
-import { prisma } from "../db/prisma";
 import { auth } from "@/auth";
+import { GetProjectSchema, Project } from '../validations/index';
+import { unstable_cache } from "next/cache";
 
-type ProjectInput = z.infer<typeof ProjectSchema>;
-type ProjectOutput = ActionState<ProjectInput, { success: boolean }>;
+type ProjectOutput = ActionState<Project, { success: boolean }>;
 
-export async function getProjects() {
-  try {
-    const projects = await prisma.project.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-    return projects;
-  } catch (error) {
-    console.error("Failed to fetch projects:", error);
-    throw new Error("Failed to fetch projects");
-  }
+export async function getProjects(input: GetProjectSchema) {
+  return await unstable_cache(
+    async () => {
+      try {
+        const offset = (input.page - 1) * input.perPage;
+
+        const where: Prisma.ProjectWhereInput = {
+          ...(input.title && {
+            title: {
+              contains: input.title,
+              mode: "insensitive",
+            },
+          }),
+
+          ...(input.featured.length === 1 && {
+            featured: input.featured[0] === "featured",
+          }),
+
+          ...(input.createdAt.length === 2 && {
+            createdAt: {
+              gte: new Date(input.createdAt[0]),
+              lte: new Date(input.createdAt[1]),
+            },
+          }),
+        };
+
+        const orderBy: Prisma.ProjectOrderByWithRelationInput[] =
+          input.sort.length > 0
+            ? input.sort.map((item) => ({
+                [item.id]: item.desc ? "desc" : "asc",
+              }))
+            : [{ createdAt: "desc" }];
+
+        const [projects, total] = await Promise.all([
+          prisma.project.findMany({
+            where,
+            skip: offset,
+            take: input.perPage,
+            orderBy,
+          }),
+          prisma.project.count({ where }),
+        ]);
+
+        const pageCount = Math.ceil(total / input.perPage);
+        return { data: projects, pageCount };
+      } catch (error) {
+        console.error("Failed to fetch projects:", error);
+        return { data: [], pageCount: 0 };
+      }
+    },
+    [JSON.stringify(input)],
+    {
+      revalidate: 1,
+      tags: ["projects"],
+    },
+  )();
 }
 
 export async function getProjectBySlug(slug: string) {
@@ -48,7 +93,7 @@ export async function getProjectById(id: string) {
   }
 }
 
-async function handler(data: ProjectInput): Promise<ProjectOutput> {
+async function handler(data: Project): Promise<ProjectOutput> {
   const session = await auth();
 
   if (!session || session.user?.role !== "admin") {

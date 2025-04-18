@@ -18,11 +18,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { formatDate } from "@/lib/format";
 import { Icons } from "@/components/icons";
-import { ProjectSchema } from "@/schemas";
-import { z } from "zod";
+
 import LongText from "@/components/long-text";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { Project } from '@/lib/validations/index';
 import {
   Tooltip,
   TooltipContent,
@@ -30,7 +30,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-type Project = z.infer<typeof ProjectSchema>;
 
 interface ProjectsTableColumnsProps {
   setRowAction: React.Dispatch<

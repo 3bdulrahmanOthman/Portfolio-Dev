@@ -51,8 +51,7 @@ export function ConfirmDeleteDialog<T>({
   const itemIdentifier = React.useMemo(() => {
     if (rows.length === 1) {
       const item = rows[0];
-      const title =
-        item["title" as keyof T] ?? item["name" as keyof T] ?? rows.length;
+      const title = item["title" as keyof T] ?? item["name" as keyof T] ?? rows.length;
       return String(title);
     }
 
@@ -71,11 +70,11 @@ export function ConfirmDeleteDialog<T>({
       }
 
       props.onOpenChange?.(false);
-      toast.success("Tasks deleted");
+      toast.success(`${itemIdentifier} deleted`);
       onSuccess?.();
     });
   }
-
+console.log("Rows Num:", rows.length)
   if (!isMobile) {
     return (
       <Dialog {...props}>
@@ -92,7 +91,7 @@ export function ConfirmDeleteDialog<T>({
             <DialogTitle>Are you absolutely sure?</DialogTitle>
             <DialogDescription>
               This action cannot be undone. This will permanently delete your{" "}
-              <span className="font-medium">{itemIdentifier}</span>
+              <span className="font-medium">{itemIdentifier}</span>{" "}
               {rows.length === 1 ? label : `${label}s`} from our servers.
             </DialogDescription>
           </DialogHeader>
@@ -135,7 +134,7 @@ export function ConfirmDeleteDialog<T>({
           <DrawerTitle>Are you absolutely sure?</DrawerTitle>
           <DrawerDescription>
             This action cannot be undone. This will permanently delete your{" "}
-            <span className="font-medium">{itemIdentifier}</span>
+            <span className="font-medium">{itemIdentifier}</span>{" "}
             {rows.length === 1 ? label : `${label}s`} from our servers.
           </DrawerDescription>
         </DrawerHeader>

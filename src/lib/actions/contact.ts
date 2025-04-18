@@ -1,14 +1,14 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { z } from "zod"
 import { auth } from "@/auth"
 import { createSafeAction, type ActionState } from "@/lib/utils"
 import { ContactSchema } from "@/schemas"
 import { prisma } from "../db/prisma"
+import { Contact } from '../validations/index';
 
-type ContactInput = z.infer<typeof ContactSchema>
-type ContactOutput = ActionState<ContactInput, { success: boolean }>
+
+type ContactOutput = ActionState<Contact, { success: boolean }>
 
 export async function getContact() {
   try {
@@ -20,7 +20,7 @@ export async function getContact() {
   }
 }
 
-async function handler(data: ContactInput): Promise<ContactOutput> {
+async function handler(data: Contact): Promise<ContactOutput> {
   const session = await auth()
 
   if (!session || session.user?.role !== "admin") {

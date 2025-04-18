@@ -18,9 +18,13 @@ interface NavItemWithChildren extends NavItem {
 
 type SidebarNavItem = NavItemWithChildren;
 
+interface SearchParams {
+  [key: string]: string | string[] | undefined;
+}
 
 export type {
   NavItem,
   NavItemWithChildren,
   SidebarNavItem,
+  SearchParams,
 };

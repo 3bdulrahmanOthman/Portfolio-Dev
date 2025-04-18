@@ -1,15 +1,14 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { z } from "zod"
 import { auth } from "@/auth"
 import { createSafeAction, type ActionState } from "@/lib/utils"
 import { AboutSchema } from "@/schemas"
 import { prisma } from "../db/prisma"
+import { About } from '../validations/index';
 
 
-type AboutInput = z.infer<typeof AboutSchema>
-type AboutOutput = ActionState<AboutInput, { success: boolean }>
+type AboutOutput = ActionState<About, { success: boolean }>
 
 export async function getAbout() {
   try {
@@ -21,7 +20,7 @@ export async function getAbout() {
   }
 }
 
-async function handler(data: AboutInput): Promise<AboutOutput> {
+async function handler(data: About): Promise<AboutOutput> {
   const session = await auth()
 
   if (!session || session.user?.role !== "admin") {
