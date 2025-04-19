@@ -1,4 +1,4 @@
-import { getProjectById } from "@/lib/actions/projects"
+import { getProjectById } from "@/actions/projects"
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 

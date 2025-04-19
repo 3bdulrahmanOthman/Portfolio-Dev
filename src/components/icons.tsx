@@ -25,6 +25,8 @@ import {
   Text,
   Globe,
   Boxes,
+  TriangleAlert,
+  CircleCheckBigIcon,
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -38,6 +40,8 @@ export const Icons = {
   laptop: Laptop,
   spinner: LoaderCircle,
   shieldAlert: ShieldAlert,
+  triangleAlert: TriangleAlert,
+  checkCircled: CircleCheckBigIcon,
   dashboard: LayoutDashboard,
   box: Package,
   boxes: Boxes,

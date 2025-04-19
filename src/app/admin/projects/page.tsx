@@ -1,10 +1,10 @@
-import { ProjectsTable } from "@/components/dashboard/projects-table";
-import { getProjects } from "@/lib/actions/projects";
+import { ProjectsTable } from "@/components/admin/projects-table";
+import { getProjects } from "@/actions/projects";
 import { DataTableSkeleton } from "@/components/data-table-skeleton";
 import * as React from "react";
-import { searchParamsCache } from "@/lib/validations/index";
 import { SearchParams } from "@/types";
 import { getValidFilters } from "@/lib/data-table";
+import { searchParamsCache } from "@/schemas";
 
 interface IndexPageProps {
   searchParams: Promise<SearchParams>;

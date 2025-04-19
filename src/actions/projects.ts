@@ -1,12 +1,11 @@
 "use server";
 
 import { Prisma } from "@prisma/client";
-import { prisma } from "../db/prisma";
+import { prisma } from "../lib/db/prisma";
 import { revalidatePath } from "next/cache";
 import { createSafeAction, type ActionState } from "@/lib/utils";
-import { ProjectSchema } from "@/schemas";
+import { GetProjectSchema, Project, ProjectSchema } from "@/schemas";
 import { auth } from "@/auth";
-import { GetProjectSchema, Project } from '../validations/index';
 import { unstable_cache } from "next/cache";
 
 type ProjectOutput = ActionState<Project, { success: boolean }>;

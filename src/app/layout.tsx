@@ -32,7 +32,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <NextTopLoader showSpinner={false} />
-        <Toaster />
+        <Toaster richColors closeButton />
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -3,9 +3,8 @@
 import { revalidatePath } from "next/cache"
 import { auth } from "@/auth"
 import { createSafeAction, type ActionState } from "@/lib/utils"
-import { AboutSchema } from "@/schemas"
-import { prisma } from "../db/prisma"
-import { About } from '../validations/index';
+import { About, AboutSchema } from "@/schemas"
+import { prisma } from "../lib/db/prisma"
 
 
 type AboutOutput = ActionState<About, { success: boolean }>

@@ -20,7 +20,7 @@ import { RenderIcon } from "@/lib/utils";
 import { Icons } from "../icons";
 import { ThemeToggle } from "../theme-toggle";
 import { useRouter } from "next/navigation";
-import { logout } from "@/lib/actions/logout";
+import { logout } from "@/actions/logout";
 
 
 export function NavHeader({ data }: {data: SidebarNavItem }) {

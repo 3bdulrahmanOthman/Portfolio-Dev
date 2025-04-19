@@ -8,14 +8,14 @@ import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
 
 import { useDataTable } from "@/hooks/use-data-table";
 import { projectsTableColumns } from "./columns";
-import { deleteProjects, getProjects } from "@/lib/actions/projects";
+import { deleteProjects, getProjects } from "@/actions/projects";
 import { ProjectTableActionBar } from "./action-bar";
 import { DataTableRowAction } from "@/types/data-table";
 import AppContentLayout from "../content-layout";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
 import { useRouter } from "next/navigation";
-import { Project } from "@/lib/validations/index";
+import { Project } from "@/schemas";
 
 interface ProjectTableProps {
   promises: Promise<[Awaited<ReturnType<typeof getProjects>>]>;
@@ -54,9 +54,9 @@ export function ProjectsTable({ promises }: ProjectTableProps) {
         <Button
           size="sm"
           variant={"default"}
-          className="h-7"
+          className="h-7 cursor-pointer"
           aria-label="Create new project"
-          onClick={() => router.push("/admin/projects/add")}
+          onClick={() => router.push("/admin/projects/new")}
         >
           <Icons.boxPlus className="size-4" />
           Create Project

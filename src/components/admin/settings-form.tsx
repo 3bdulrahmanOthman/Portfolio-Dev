@@ -75,13 +75,7 @@ export default function SettingsForm() {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Name"
-                      disabled={isPending}
-                      autoComplete="name"
-                      value={field.value ?? ""}
-                    />
+                    <Input {...field} placeholder="Name" disabled={isPending} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -98,11 +92,9 @@ export default function SettingsForm() {
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder="Email"
                       type="email"
+                      placeholder="Email"
                       disabled={isPending}
-                      autoComplete="email"
-                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -110,7 +102,7 @@ export default function SettingsForm() {
               )}
             />
 
-            {/* Current Password Field */}
+            {/* Password Field */}
             <FormField
               control={form.control}
               name="password"
@@ -118,13 +110,7 @@ export default function SettingsForm() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <PasswordInput
-                      {...field}
-                      placeholder="Password"
-                      disabled={isPending}
-                      autoComplete="current-password"
-                      value={field.value ?? ""}
-                    />
+                    <PasswordInput {...field} placeholder="Password" disabled={isPending} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -139,20 +125,14 @@ export default function SettingsForm() {
                 <FormItem>
                   <FormLabel>New Password</FormLabel>
                   <FormControl>
-                    <PasswordInput
-                      {...field}
-                      placeholder="New Password"
-                      disabled={isPending}
-                      autoComplete="new-password"
-                      value={field.value ?? ""}
-                    />
+                    <PasswordInput {...field} placeholder="New Password" disabled={isPending} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Confirm New Password Field */}
+            {/* New Password Confirmation Field */}
             <FormField
               control={form.control}
               name="newPasswordConfirmation"
@@ -164,8 +144,6 @@ export default function SettingsForm() {
                       {...field}
                       placeholder="Confirm New Password"
                       disabled={isPending}
-                      autoComplete="new-password"
-                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -173,7 +151,7 @@ export default function SettingsForm() {
               )}
             />
 
-            {/* Alerts */}
+            {/* Status Messages */}
             <div className="space-y-4">
               {status.error && (
                 <Alert variant="destructive" withBackground>
@@ -190,11 +168,12 @@ export default function SettingsForm() {
             </div>
           </div>
 
+          {/* Submit Button */}
           <Button
             type="submit"
             disabled={isPending}
             className="w-full mt-auto"
-            size="sm"
+            size={"sm"}
           >
             {isPending ? (
               <>

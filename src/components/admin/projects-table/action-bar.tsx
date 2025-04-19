@@ -19,8 +19,8 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { exportTableToCSV } from "@/lib/export";
-import { deleteProjects, updateProjects } from "@/lib/actions/projects";
-import { Project } from '@/lib/validations/index';
+import { deleteProjects, updateProjects } from "@/actions/projects";
+import { Project } from "@/schemas";
 
 type Action = "update-featured" | "export" | "delete";
 

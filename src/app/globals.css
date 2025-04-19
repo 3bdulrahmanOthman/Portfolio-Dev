@@ -1,4 +1,6 @@
 @import "tailwindcss";
+
+@plugin "tailwind-scrollbar-hide";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -158,6 +160,8 @@
   --shadow-lg: var(--shadow-lg);
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
+  --color-highlight: var(----highlight);
+  --color-brand: var(----brand);
 }
 
 @layer base {
@@ -167,4 +171,15 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+[data-registry="plate"] {
+  --radius: 0.6rem;
+  --brand: hsl(217.2 91.2% 59.8%);
+  --highlight: hsl(47.9 95.8% 53.1%);
+}
+
+[data-registry="plate"].dark {
+  --brand: hsl(213.3 93.9% 67.8%);
+  --highlight: hsl(48 96% 53%);
 }

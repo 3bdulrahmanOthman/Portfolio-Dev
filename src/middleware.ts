@@ -3,7 +3,7 @@ import {
   apiAuthPrefix,
   authRoutes,
   publicRoutes,
-} from "@/lib/auth/routes";
+} from "@/routes";
 import NextAuth from "next-auth";
 import authConfig from "./auth.config";
 
@@ -12,7 +12,7 @@ const { auth } = NextAuth(authConfig);
 export default auth((req) => {
   const { nextUrl } = req;
   const isAuthorized = !!req.auth;
-
+  
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);

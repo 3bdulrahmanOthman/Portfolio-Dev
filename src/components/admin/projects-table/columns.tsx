@@ -22,13 +22,13 @@ import { Icons } from "@/components/icons";
 import LongText from "@/components/long-text";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Project } from '@/lib/validations/index';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Project } from "@/schemas";
 
 
 interface ProjectsTableColumnsProps {

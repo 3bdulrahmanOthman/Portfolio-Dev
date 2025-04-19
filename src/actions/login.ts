@@ -2,9 +2,9 @@
 
 import * as z from "zod";
 import { LoginSchema } from "@/schemas";
-import { getUserByEmail } from "../user";
-import { signIn } from "../../auth";
-import { DEFAULT_LOGIN_REDIRECT } from "../auth/routes";
+import { getUserByEmail } from "../lib/user";
+import { signIn } from "../auth";
+import { DEFAULT_LOGIN_REDIRECT } from "../routes";
 import { AuthError } from "next-auth";
 
 export const login = async (
