@@ -59,7 +59,7 @@ export const dashboardConfig: DashboardConfig = {
             },
             {
               title: "Add",
-              path: "/admin/projects/add",
+              path: "/admin/projects/new",
               icon: "boxPlus",
             },
           ],

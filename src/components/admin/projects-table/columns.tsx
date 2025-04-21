@@ -21,7 +21,7 @@ import { Icons } from "@/components/icons";
 
 import LongText from "@/components/long-text";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn, slugify } from "@/lib/utils";
 import {
   Tooltip,
   TooltipContent,
@@ -209,7 +209,7 @@ export function projectsTableColumns({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
               <DropdownMenuItem asChild>
-                <Link href={`/admin/projects/${row.original.id}`}>Edit</Link>
+                <Link href={`/admin/projects/${slugify(row.original.title)}/edit`}>Edit</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem

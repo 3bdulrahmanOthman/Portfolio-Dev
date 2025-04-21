@@ -24,13 +24,15 @@ import { Shell } from "../shell";
 import { Icons } from "../icons";
 import { Alert, AlertTitle } from "../ui/alert";
 
+type Settings = z.infer<typeof SettingsSchema>;
+
 export default function SettingsForm() {
   const { data, update } = useSession();
 
   const [status, setStatus] = useState({ error: "", success: "" });
   const [isPending, startTransition] = useTransition();
 
-  const form = useForm<z.infer<typeof SettingsSchema>>({
+  const form = useForm<Settings>({
     resolver: zodResolver(SettingsSchema),
     defaultValues: {
       password: undefined,
@@ -41,7 +43,7 @@ export default function SettingsForm() {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof SettingsSchema>) => {
+  const onSubmit = async (values: Settings) => {
     setStatus({ error: "", success: "" });
 
     startTransition(() => {

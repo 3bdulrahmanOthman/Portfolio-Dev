@@ -314,13 +314,20 @@ const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootProps>((pr
     value,
     defaultValue,
     onValueChange,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onAccept,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onFileAccept,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onFileReject,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onFileValidate,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onUpload,
     accept,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     maxFiles,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     maxSize,
     dir: dirProp,
     label,
@@ -767,6 +774,7 @@ const FileUploadList = React.forwardRef<HTMLDivElement, FileUploadListProps>((pr
 
   const context = useFileUploadContext(LIST_NAME)
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const shouldRender = forceMount || useStore((state) => state.files.size > 0)
 
   if (!shouldRender) return null
@@ -1181,6 +1189,7 @@ const FileUploadClear = React.forwardRef<HTMLButtonElement, FileUploadClearProps
     [store, propsRef],
   )
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const shouldRender = forceMount || useStore((state) => state.files.size > 0)
 
   if (!shouldRender) return null

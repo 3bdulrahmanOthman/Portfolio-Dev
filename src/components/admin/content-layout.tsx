@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { SidebarTrigger } from "../ui/sidebar";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -19,8 +18,7 @@ export default function AppContentLayout({
   return (
     <div className="h-svh overflow-hidden md:p-2 w-full">
       <div className="md:border md:rounded-md overflow-hidden flex flex-col items-center justify-start bg-container h-full w-full">
-        <div className="w-full flex justify-between items-center border-b py-1.5 px-6 h-10">
-          <SidebarTrigger />
+        <div className={"w-full flex items-center border-b py-1.5 px-6 h-10"}>
           {header}
         </div>
         <div

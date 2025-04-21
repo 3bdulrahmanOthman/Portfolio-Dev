@@ -26,7 +26,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 interface ConfirmDeleteDialogProps<T>
   extends React.ComponentPropsWithoutRef<typeof Dialog> {
@@ -46,7 +46,7 @@ export function ConfirmDeleteDialog<T>({
   ...props
 }: ConfirmDeleteDialogProps<T>) {
   const [isDeletePending, startDeleteTransition] = React.useTransition();
-  const isMobile = useIsMobile();
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   const itemIdentifier = React.useMemo(() => {
     if (rows.length === 1) {

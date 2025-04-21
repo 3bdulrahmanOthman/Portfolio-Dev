@@ -95,7 +95,7 @@ export const ContactSchema = z.object({
 export type Contact = z.infer<typeof ContactSchema>;
 
 export const ProjectSchema = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   title: z.string().min(1, "Title is required"),
   slug: z.string().min(1, "Slug is required"),
   description: z.string().min(1, "Description is required"),

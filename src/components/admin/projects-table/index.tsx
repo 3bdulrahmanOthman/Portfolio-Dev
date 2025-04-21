@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
 import { useRouter } from "next/navigation";
 import { Project } from "@/schemas";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 interface ProjectTableProps {
   promises: Promise<[Awaited<ReturnType<typeof getProjects>>]>;
@@ -43,7 +44,7 @@ export function ProjectsTable({ promises }: ProjectTableProps) {
       sorting: [{ id: "createdAt", desc: true }],
       columnPinning: { right: ["actions"] },
     },
-    getRowId: (originalRow) => originalRow.id,
+    getRowId: (originalRow) => originalRow.id ?? "",
     shallow: false,
     clearOnDefault: true,
   });
@@ -51,23 +52,26 @@ export function ProjectsTable({ promises }: ProjectTableProps) {
   return (
     <AppContentLayout
       header={
-        <Button
-          size="sm"
-          variant={"default"}
-          className="h-7 cursor-pointer"
-          aria-label="Create new project"
-          onClick={() => router.push("/admin/projects/new")}
-        >
-          <Icons.boxPlus className="size-4" />
-          Create Project
-        </Button>
+        <div className="w-full flex justify-between gap-4">
+          <SidebarTrigger />
+          <Button
+            size="sm"
+            variant={"default"}
+            className="h-7 cursor-pointer"
+            aria-label="Create new project"
+            onClick={() => router.push("/admin/projects/new")}
+          >
+            <Icons.boxPlus className="size-4" />
+            Create Project
+          </Button>
+        </div>
       }
     >
       <DataTable
         table={table}
         actionBar={<ProjectTableActionBar table={table} />}
       >
-        <DataTableToolbar table={table} className="items-center py-1 px-6"/>
+        <DataTableToolbar table={table} className="items-center py-1 px-6" />
       </DataTable>
 
       <ConfirmDeleteDialog

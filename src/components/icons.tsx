@@ -27,6 +27,10 @@ import {
   Boxes,
   TriangleAlert,
   CircleCheckBigIcon,
+  Trash,
+  CloudUpload,
+  Image,
+  X,
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -58,6 +62,10 @@ export const Icons = {
   circleDashed: CircleDashed,
   text: Text,
   globe: Globe,
+  trash: Trash,
+  cloudUpload: CloudUpload,
+  image: Image,
+  close: X,
   logo: ({ ...props }: LucideProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
