@@ -74,7 +74,7 @@ export function ConfirmDeleteDialog<T>({
       onSuccess?.();
     });
   }
-console.log("Rows Num:", rows.length)
+  
   if (!isMobile) {
     return (
       <Dialog {...props}>
