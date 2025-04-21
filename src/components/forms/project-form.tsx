@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm, SubmitHandler, FieldErrors } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -53,8 +53,9 @@ export default function ProjectForm({ project }: ProjectFormProps) {
           description: "",
           content: "",
           image: "",
-          demoUrl: "",
-          githubUrl: "",
+          demoUrl: null,
+          githubUrl: null,
+          featured: false,
         },
   });
 
@@ -98,9 +99,9 @@ export default function ProjectForm({ project }: ProjectFormProps) {
     });
   };
 
-  const onError = (errors: FieldErrors<Project>) => {
-    console.error("❌ Form Errors:", errors);
-  };
+  // const onError = (errors: FieldErrors<Project>) => {
+  //   console.error("❌ Form Errors:", errors);
+  // };
 
   return (
     <AppContentLayout
@@ -115,11 +116,11 @@ export default function ProjectForm({ project }: ProjectFormProps) {
     >
       <Shell variant="sidebar">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit, onError)}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
             <ScrollArea className="h-[calc(100svh-140px)] md:h-[calc(100svh-160px)]">
               <div className="space-y-6 px-6">
                 {/* Title & Slug */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 items-start gap-6">
                   <FormField
                     control={form.control}
                     name="title"
@@ -320,11 +321,16 @@ export default function ProjectForm({ project }: ProjectFormProps) {
                 Cancel
               </Button>
               <Button type="submit" disabled={isPending}>
-                {isPending
-                  ? "Saving..."
-                  : isEdit
-                  ? "Update Project"
-                  : "Create Project"}
+                {isPending ? (
+                  <>
+                    <Icons.spinner className="animate-spin" />
+                    <span>Saving...</span>
+                  </>
+                ) : isEdit ? (
+                  "Update Project"
+                ) : (
+                  "Create Project"
+                )}
               </Button>
             </div>
           </form>

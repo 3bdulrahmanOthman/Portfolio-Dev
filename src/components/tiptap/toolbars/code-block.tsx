@@ -1,50 +1,27 @@
-"use client";
-
 import { Code } from "lucide-react";
+import { EditorButton } from "../_components/editor-button";
 import React from "react";
-
-import { Button, type ButtonProps } from "@/components/ui/button";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+import { ButtonProps } from "@/components/ui/button";
 import { useToolbar } from "./toolbar-provider";
 
-const CodeBlockToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
-	({ className, onClick, children, ...props }, ref) => {
-		const { editor } = useToolbar();
-		return (
-			<Tooltip>
-				<TooltipTrigger asChild>
-					<Button
-						variant="ghost"
-						size="icon"
-						className={cn(
-							"size-8 p-0 sm:size-9",
-							editor?.isActive("codeBlock") && "bg-accent",
-							className,
-						)}
-						onClick={(e) => {
-							editor?.chain().focus().toggleCodeBlock().run();
-							onClick?.(e);
-						}}
-						disabled={!editor?.can().chain().focus().toggleCodeBlock().run()}
-						ref={ref}
-						{...props}
-					>
-						{children ?? <Code className="size-4" />}
-					</Button>
-				</TooltipTrigger>
-				<TooltipContent>
-					<span>Code Block</span>
-				</TooltipContent>
-			</Tooltip>
-		);
-	},
-);
+export const CodeBlockToolbar = React.forwardRef<
+  HTMLButtonElement,
+  ButtonProps
+>(({children, ...props}, ref) => {
+  const { editor } = useToolbar();
+  const isActive = editor?.isActive("codeBlock");
+  const canToggle = editor?.can().chain().focus().toggleCodeBlock().run();
 
+  return (
+    <EditorButton
+      ref={ref}
+      icon={children ?? <Code className="size-4" />}
+      isActive={isActive}
+      tooltip="Code Block"
+      disabled={!canToggle}
+      onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
+      {...props}
+    />
+  );
+});
 CodeBlockToolbar.displayName = "CodeBlockToolbar";
-
-export { CodeBlockToolbar };

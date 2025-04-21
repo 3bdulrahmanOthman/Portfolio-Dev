@@ -3,49 +3,32 @@
 import { UnderlineIcon } from "lucide-react";
 import React from "react";
 
-import { Button, type ButtonProps } from "@/components/ui/button";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
 import { useToolbar } from "./toolbar-provider";
+import { ButtonProps } from "@/components/ui/button";
+import { EditorButton } from "../_components/editor-button";
 
-const UnderlineToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
-	({ className, onClick, children, ...props }, ref) => {
-		const { editor } = useToolbar();
-		return (
-			<Tooltip>
-				<TooltipTrigger asChild>
-					<Button
-						variant="ghost"
-						size="icon"
-						className={cn(
-							"size-8 p-0 sm:size-9",
-							editor?.isActive("underline") && "bg-accent",
-							className,
-						)}
-						onClick={(e) => {
-							editor?.chain().focus().toggleUnderline().run();
-							onClick?.(e);
-						}}
-						disabled={!editor?.can().chain().focus().toggleUnderline().run()}
-						ref={ref}
-						{...props}
-					>
-						{children ?? <UnderlineIcon className="size-4" />}
-					</Button>
-				</TooltipTrigger>
-				<TooltipContent>
-					<span>Underline</span>
-					<span className="ml-1 text-xs text-gray-11">(cmd + u)</span>
-				</TooltipContent>
-			</Tooltip>
-		);
-	},
+export const UnderlineToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, onClick, children, ...props }, ref) => {
+    const { editor } = useToolbar();
+    const isActive = editor?.isActive("underline");
+    const canToggle = editor?.can().chain().focus().toggleUnderline().run();
+
+    return (
+      <EditorButton
+        className={className}
+        icon={children ?? <UnderlineIcon className="size-4" />}
+        isActive={isActive}
+        tooltip="Underline (⌘ + U)"
+        onClick={(e) => {
+          editor?.chain().focus().toggleUnderline().run();
+          onClick?.(e);
+        }}
+        disabled={!canToggle}
+        ref={ref}
+        {...props}
+      />
+    );
+  }
 );
 
 UnderlineToolbar.displayName = "UnderlineToolbar";
-
-export { UnderlineToolbar };

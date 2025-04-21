@@ -2,49 +2,32 @@
 
 import { TextQuote } from "lucide-react";
 import React from "react";
-
-import { Button, type ButtonProps } from "@/components/ui/button";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
 import { useToolbar } from "./toolbar-provider";
+import { EditorButton } from "../_components/editor-button";
+import { ButtonProps } from "@/components/ui/button";
 
-const BlockquoteToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
-	({ className, onClick, children, ...props }, ref) => {
-		const { editor } = useToolbar();
-		return (
-			<Tooltip>
-				<TooltipTrigger asChild>
-					<Button
-						variant="ghost"
-						size="icon"
-						className={cn(
-							"h-8 w-8 p-0 sm:h-9 sm:w-9",
-							editor?.isActive("blockquote") && "bg-accent",
-							className,
-						)}
-						onClick={(e) => {
-							editor?.chain().focus().toggleBlockquote().run();
-							onClick?.(e);
-						}}
-						disabled={!editor?.can().chain().focus().toggleBlockquote().run()}
-						ref={ref}
-						{...props}
-					>
-						{children ?? <TextQuote className="h-4 w-4" />}
-					</Button>
-				</TooltipTrigger>
-				<TooltipContent>
-					<span>Blockquote</span>
-				</TooltipContent>
-			</Tooltip>
-		);
-	},
-);
+export const BlockquoteToolbar = React.forwardRef<
+  HTMLButtonElement,
+  ButtonProps
+>(({ className, children, onClick }, ref) => {
+  const { editor } = useToolbar();
+  const isActive = editor?.isActive("blockquote");
+  const canToggle = editor?.can().chain().focus().toggleBlockquote().run();
+
+  return (
+    <EditorButton
+      ref={ref}
+      icon={children ?? <TextQuote className="size-4" />}
+      isActive={isActive}
+      tooltip="Blockquote"
+      onClick={(e) => {
+        editor?.chain().focus().toggleBlockquote().run();
+        onClick?.(e);
+      }}
+      className={className}
+      disabled={!canToggle}
+    />
+  );
+});
 
 BlockquoteToolbar.displayName = "BlockquoteToolbar";
-
-export { BlockquoteToolbar };

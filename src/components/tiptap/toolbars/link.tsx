@@ -1,129 +1,164 @@
 "use client";
-/* eslint-disable */
-// @ts-nocheck
-import { PopoverClose } from "@radix-ui/react-popover";
-import { Trash2, X } from "lucide-react";
 
-import React, { type FormEvent } from "react";
-
-import { Button, type ButtonProps } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+import * as React from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Link, PlusCircle, RefreshCw, Trash2, X } from "lucide-react";
 
 import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
 } from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { useToolbar } from "./toolbar-provider";
 import { getUrlFromString } from "@/lib/tiptap-utils";
+import { PopoverClose } from "@radix-ui/react-popover";
 
-const LinkToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
-	({ className, ...props }, ref) => {
-		const { editor } = useToolbar();
-		const [link, setLink] = React.useState("");
+const linkSchema = z.object({
+  href: z.string().url({ message: "Enter a valid URL" }),
+});
 
-		const handleSubmit = (e: FormEvent) => {
-			e.preventDefault();
-			const url = getUrlFromString(link);
-			url && editor?.chain().focus().setLink({ href: url }).run();
-		};
+type LinkFormValues = z.infer<typeof linkSchema>;
 
-		React.useEffect(() => {
-			setLink(editor?.getAttributes("link").href ?? "");
-		}, [editor]);
+export const LinkToolbar = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<typeof Button>
+>(({ className, ...props }, ref) => {
+  const { editor } = useToolbar();
+  const form = useForm<LinkFormValues>({
+    resolver: zodResolver(linkSchema),
+    defaultValues: { href: "" },
+  });
 
-		return (
-			<Popover>
-				<Tooltip>
-					<TooltipTrigger asChild>
-						<PopoverTrigger
-							disabled={!editor?.can().chain().setLink({ href: "" }).run()}
-							asChild
-						>
-							<Button
-								variant="ghost"
-								size="sm"
-								className={cn(
-									"h-8 w-max px-3 font-normal",
-									editor?.isActive("link") && "bg-accent",
-									className,
-								)}
-								ref={ref}
-								{...props}
-							>
-								<p className="mr-2 text-base">↗</p>
-								<p className={"underline decoration-gray-7 underline-offset-4"}>
-									Link
-								</p>
-							</Button>
-						</PopoverTrigger>
-					</TooltipTrigger>
-					<TooltipContent>
-						<span>Link</span>
-					</TooltipContent>
-				</Tooltip>
+  const [open, setOpen] = React.useState(false);
 
-				<PopoverContent
-					onCloseAutoFocus={(e) => {
-						e.preventDefault();
-					}}
-					asChild
-					className="relative px-3 py-2.5"
-				>
-					<div className="relative">
-						<PopoverClose className="absolute right-3 top-3">
-							<X className="h-4 w-4" />
-						</PopoverClose>
-						<form onSubmit={handleSubmit}>
-							<Label>Link</Label>
-							<p className="text-sm text-gray-11">
-								Attach a link to the selected text
-							</p>
-							<div className="mt-3 flex flex-col items-end justify-end gap-3">
-								<Input
-									value={link}
-									onChange={(e) => {
-										setLink(e.target.value);
-									}}
-									className="w-full"
-									placeholder="https://example.com"
-								/>
-								<div className="flex items-center gap-3">
-									{editor?.getAttributes("link").href && (
-										<Button
-											type="reset"
-											size="sm"
-											className="h-8 text-gray-11"
-											variant="ghost"
-											onClick={() => {
-												editor?.chain().focus().unsetLink().run();
-												setLink("");
-											}}
-										>
-											<Trash2 className="mr-2 h-4 w-4" />
-											Remove
-										</Button>
-									)}
-									<Button size="sm" className="h-8">
-										{editor?.getAttributes("link").href ? "Update" : "Confirm"}
-									</Button>
-								</div>
-							</div>
-						</form>
-					</div>
-				</PopoverContent>
-			</Popover>
-		);
-	},
-);
+  const isTextSelected = !!editor?.state.selection?.content()?.size;
+
+  const resetForm = () => {
+    const existingHref = editor?.getAttributes("link")?.href || "";
+    form.reset({ href: existingHref });
+  };
+
+  const handleSubmit = (data: LinkFormValues) => {
+    const url = getUrlFromString(data.href);
+    if (!url) return;
+    editor?.chain().focus().setLink({ href: url }).run();
+    setOpen(false);
+  };
+
+  const handleRemoveLink = () => {
+    editor?.chain().focus().unsetLink().run();
+    form.reset();
+    setOpen(false);
+  };
+
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (isOpen) resetForm();
+  };
+
+  const canInsertLink = editor?.can().chain().setLink({ href: "" }).run();
+
+  return (
+    <Popover open={open} onOpenChange={handleOpenChange}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <PopoverTrigger asChild disabled={!canInsertLink || !isTextSelected}>
+            <Button
+              ref={ref}
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "size-7",
+                editor?.isActive("link") && "bg-accent",
+                className
+              )}
+			  aria-label="Toolbar Link"
+			  type="button"
+              {...props}
+            >
+              <Link />
+            </Button>
+          </PopoverTrigger>
+        </TooltipTrigger>
+        <TooltipContent>Insert or edit link</TooltipContent>
+      </Tooltip>
+
+      <PopoverContent className="p-2" sideOffset={8} align="start">
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="flex items-center gap-2"
+          >
+            <FormField
+              control={form.control}
+              name="href"
+              render={({ field }) => (
+                <FormItem>
+                  {/* <FormLabel>Link</FormLabel>
+                  <FormDescription>
+                    Attach a link to the selected text
+                  </FormDescription> */}
+                  <FormControl>
+                    <Input
+                      autoFocus
+                      placeholder="https://example.com"
+                      className="h-7 rounded-sm"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button type="submit" size="icon" className="cursor-pointer size-7">
+              {editor?.isActive("link") ? <RefreshCw /> : <PlusCircle />}
+              <span className="sr-only">
+                {editor?.isActive("link") ? "Update" : "Apply"}
+              </span>
+            </Button>
+
+            {editor?.isActive("link") && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="cursor-pointer !text-destructive size-7"
+                onClick={handleRemoveLink}
+              >
+                <Trash2 />
+                <span className="sr-only">Remove</span>
+              </Button>
+            )}
+
+            <PopoverClose className="cursor-pointer p-0" asChild>
+              <Button variant="ghost" size="icon" className="size-7">
+                <X />
+                <span className="sr-only">close</span>
+              </Button>
+            </PopoverClose>
+          </form>
+        </Form>
+      </PopoverContent>
+    </Popover>
+  );
+});
 
 LinkToolbar.displayName = "LinkToolbar";
-
-export { LinkToolbar };

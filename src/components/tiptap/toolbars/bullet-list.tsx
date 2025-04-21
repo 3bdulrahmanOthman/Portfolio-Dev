@@ -1,51 +1,27 @@
-"use client";
-
-import { List } from "lucide-react";
 import React from "react";
-
-import { Button, type ButtonProps } from "@/components/ui/button";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+import { EditorButton } from "../_components/editor-button";
 import { useToolbar } from "./toolbar-provider";
+import { ButtonProps } from "@/components/ui/button";
+import { List } from "lucide-react";
 
-const BulletListToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
-	({ className, onClick, children, ...props }, ref) => {
-		const { editor } = useToolbar();
+export const BulletListToolbar = React.forwardRef<
+  HTMLButtonElement,
+  ButtonProps
+>(({children, ...props}, ref) => {
+  const { editor } = useToolbar();
+  const isActive = editor?.isActive("bulletList");
+  const canToggle = editor?.can().chain().focus().toggleBulletList().run();
 
-		return (
-			<Tooltip>
-				<TooltipTrigger asChild>
-					<Button
-						variant="ghost"
-						size="icon"
-						className={cn(
-							"size-8 p-0 sm:size-9",
-							editor?.isActive("bulletList") && "bg-accent",
-							className,
-						)}
-						onClick={(e) => {
-							editor?.chain().focus().toggleBulletList().run();
-							onClick?.(e);
-						}}
-						disabled={!editor?.can().chain().focus().toggleBulletList().run()}
-						ref={ref}
-						{...props}
-					>
-						{children ?? <List className="size-4" />}
-					</Button>
-				</TooltipTrigger>
-				<TooltipContent>
-					<span>Bullet list</span>
-				</TooltipContent>
-			</Tooltip>
-		);
-	},
-);
-
+  return (
+    <EditorButton
+      ref={ref}
+      icon={children ?? <List className="size-4" />}
+      isActive={isActive}
+      tooltip="Bullet list"
+      disabled={!canToggle}
+      onClick={() => editor?.chain().focus().toggleBulletList().run()}
+      {...props}
+    />
+  );
+});
 BulletListToolbar.displayName = "BulletListToolbar";
-
-export { BulletListToolbar };

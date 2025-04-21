@@ -3,43 +3,28 @@
 import { WrapText } from "lucide-react";
 import React from "react";
 
-import { Button, type ButtonProps } from "@/components/ui/button";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
 import { useToolbar } from "./toolbar-provider";
+import { ButtonProps } from "@/components/ui/button";
+import { EditorButton } from "../_components/editor-button";
 
-const HardBreakToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
-	({ className, onClick, children, ...props }, ref) => {
-		const { editor } = useToolbar();
-		return (
-			<Tooltip>
-				<TooltipTrigger asChild>
-					<Button
-						variant="ghost"
-						size="icon"
-						className={cn("size-8 p-0 sm:size-9", className)}
-						onClick={(e) => {
-							editor?.chain().focus().setHardBreak().run();
-							onClick?.(e);
-						}}
-						ref={ref}
-						{...props}
-					>
-						{children ?? <WrapText className="size-4" />}
-					</Button>
-				</TooltipTrigger>
-				<TooltipContent>
-					<span>Hard break</span>
-				</TooltipContent>
-			</Tooltip>
-		);
-	},
+export const HardBreakToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, onClick, children, ...props }, ref) => {
+    const { editor } = useToolbar();
+
+    return (
+      <EditorButton
+        className={className}
+        icon={children ?? <WrapText className="size-4" />}
+        tooltip="Hard break"
+        onClick={(e) => {
+          editor?.chain().focus().setHardBreak().run();
+          onClick?.(e); 
+        }}
+        ref={ref}
+        {...props}
+      />
+    );
+  }
 );
 
 HardBreakToolbar.displayName = "HardBreakToolbar";
-
-export { HardBreakToolbar };

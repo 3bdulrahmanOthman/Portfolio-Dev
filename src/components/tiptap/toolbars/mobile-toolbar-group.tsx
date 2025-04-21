@@ -1,16 +1,16 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { ChevronDown } from "lucide-react";
-import React, { useState } from "react";
+import { ChevronsUpDown } from "lucide-react";
+import { Button, ButtonProps } from "@/components/ui/button";
 import {
   Drawer,
+  DrawerClose,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import { cn } from "@/lib/utils";
 
 interface MobileToolbarGroupProps {
   label: string;
@@ -18,68 +18,70 @@ interface MobileToolbarGroupProps {
   className?: string;
 }
 
-export const MobileToolbarGroup = ({
+export const MobileToolbarGroup: React.FC<MobileToolbarGroupProps> = ({
   label,
   children,
   className,
-}: MobileToolbarGroupProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+}) => {
+  // const [isOpen, setIsOpen] = useState(false);
 
-  const closeDrawer = () => setIsOpen(false);
+  // const handleClose = () => setIsOpen(false);
 
   return (
-    <Drawer open={isOpen} onOpenChange={setIsOpen}>
+    <Drawer>
       <DrawerTrigger asChild>
         <Button
           variant="ghost"
           size="sm"
-          className={cn("h-8 w-max gap-1 px-3 font-normal", className)}
+          className={cn(
+            "h-8 w-max gap-1 px-3 text-sm font-medium sm:h-9 sm:text-base",
+            className
+          )}
         >
           {label}
-          <ChevronDown className="h-4 w-4" />
+          <ChevronsUpDown className="size-4" />
         </Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle className="text-start">{label}</DrawerTitle>
+          <DrawerTitle className="text-center text-base font-semibold">
+            {label}
+          </DrawerTitle>
         </DrawerHeader>
-        <div className="flex flex-col p-4">
-          {React.Children.map(children, (child) =>
-            React.isValidElement(child)
-              ? React.cloneElement(child, { closeDrawer } as {
-                  closeDrawer: () => void;
-                })
-              : child,
-          )}
-        </div>
+        <DrawerClose className="flex flex-col items-center  gap-2 py-3">
+          {children}
+        </DrawerClose>
       </DrawerContent>
     </Drawer>
   );
 };
 
-export const MobileToolbarItem = ({
+type MobileToolbarItemProps = ButtonProps & {
+  active?: boolean;
+};
+
+export const MobileToolbarItem: React.FC<MobileToolbarItemProps> = ({
   children,
   active,
   onClick,
-  closeDrawer,
+  className,
   ...props
-}: React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  active?: boolean;
-  closeDrawer?: () => void;
-}) => (
-  <button
-    className={cn(
-      "flex w-full items-center rounded-md px-4 py-2 text-sm transition-colors hover:bg-accent",
-      active && "bg-accent",
-    )}
-    onClick={(e) => {
-      onClick?.(e);
-      setTimeout(() => {
-        closeDrawer?.();
-      }, 100);
-    }}
-    {...props}
-  >
-    {children}
-  </button>
-);
+}) => {
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      className={cn(
+        "h-8 w-full text-start",
+        active && "bg-accent text-accent-foreground",
+        className
+      )}
+      onClick={(e) => {
+        onClick?.(e);
+      }}
+      {...props}
+    >
+      {children}
+    </Button>
+  );
+};

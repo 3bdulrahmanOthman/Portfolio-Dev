@@ -31,6 +31,12 @@ import {
   CloudUpload,
   Image,
   X,
+  Edit,
+  EllipsisVertical,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Maximize,
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -58,6 +64,7 @@ export const Icons = {
   settings: Cog,
   logout: LogOut,
   ellipsis: Ellipsis,
+  ellipsisVertical: EllipsisVertical,
   calendar: Calendar,
   circleDashed: CircleDashed,
   text: Text,
@@ -66,6 +73,11 @@ export const Icons = {
   cloudUpload: CloudUpload,
   image: Image,
   close: X,
+  edit: Edit,
+  alignRight: AlignRight,
+  alignCenter: AlignCenter,
+  alignLeft: AlignLeft,
+  maximize: Maximize,
   logo: ({ ...props }: LucideProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"

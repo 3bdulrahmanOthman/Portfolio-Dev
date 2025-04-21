@@ -1,62 +1,38 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React from "react";
 import { Image as ImageIcon } from "lucide-react";
 
-import { Button, type ButtonProps } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+import { ButtonProps } from "@/components/ui/button";
 import { useToolbar } from "./toolbar-provider";
+import { EditorButton } from "../_components/editor-button";
 
-const ImagePlaceholderToolbar = React.forwardRef<
-  HTMLButtonElement,
-  ButtonProps
->(({ className, onClick, children, ...props }, ref) => {
-  const { editor } = useToolbar();
+const ImagePlaceholderToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, onClick, children, ...props }, ref) => {
+    const { editor } = useToolbar();
+    const isActive = editor?.isActive("image-placeholder");
 
-  const handleClick = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.preventDefault();
-      if (!editor) return;
+    return (
+      <EditorButton
+        ref={ref}
+        className={className}
+        icon={children ?? <ImageIcon className="size-4" />}
+        isActive={isActive}
+        tooltip="Image"
+        aria-label="Insert Image"
+        title="Insert Image"
+        onClick={(e) => {
+          e.preventDefault();
+          if (!editor) return;
 
-      editor.chain().focus().insertImagePlaceholder().run();
-      onClick?.(e);
-    },
-    [editor, onClick]
-  );
-
-  const isActive = editor?.isActive("image-placeholder");
-
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button
-          ref={ref}
-          variant="ghost"
-          size="icon"
-          aria-label="Insert Image"
-          title="Insert Image"
-          className={cn(
-            "size-8 p-0 sm:size-9",
-            isActive && "bg-accent",
-            className
-          )}
-          onClick={handleClick}
-          {...props}
-        >
-          {children ?? <ImageIcon className="size-4" />}
-        </Button>
-      </TooltipTrigger>
-      <TooltipContent>
-        <span>Image</span>
-      </TooltipContent>
-    </Tooltip>
-  );
-});
+          editor.chain().focus().insertImagePlaceholder().run();
+          onClick?.(e);
+        }}
+        {...props}
+      />
+    );
+  }
+);
 
 ImagePlaceholderToolbar.displayName = "ImagePlaceholderToolbar";
 

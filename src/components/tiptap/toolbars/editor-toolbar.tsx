@@ -1,4 +1,3 @@
-import { Separator } from "@/components/ui/separator";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ToolbarProvider } from "./toolbar-provider";
@@ -16,11 +15,11 @@ import { LinkToolbar } from "./link";
 import { BulletListToolbar } from "./bullet-list";
 import { OrderedListToolbar } from "./ordered-list";
 import { HorizontalRuleToolbar } from "./horizontal-rule";
-import { AlignmentTooolbar } from "./alignment";
 import { ImagePlaceholderToolbar } from "./image-placeholder-toolbar";
 import { ColorHighlightToolbar } from "./color-and-highlight";
 import { SearchAndReplaceToolbar } from "./search-and-replace-toolbar";
 import { CodeBlockToolbar } from "./code-block";
+import { AlignmentToolbar } from "./alignment";
 
 export const EditorToolbar = ({ editor }: { editor: Editor }) => {
   return (
@@ -33,14 +32,13 @@ export const EditorToolbar = ({ editor }: { editor: Editor }) => {
                 {/* History Group */}
                 <UndoToolbar />
                 <RedoToolbar />
-                <Separator orientation="vertical" className="mx-1 h-7" />
 
                 {/* Text Structure Group */}
                 <HeadingsToolbar />
+                <ColorHighlightToolbar />
                 <BlockquoteToolbar />
                 <CodeToolbar />
                 <CodeBlockToolbar/>
-                <Separator orientation="vertical" className="mx-1 h-7" />
 
                 {/* Basic Formatting Group */}
                 <BoldToolbar />
@@ -48,24 +46,17 @@ export const EditorToolbar = ({ editor }: { editor: Editor }) => {
                 <UnderlineToolbar />
                 <StrikeThroughToolbar />
                 <LinkToolbar />
-                <Separator orientation="vertical" className="mx-1 h-7" />
 
                 {/* Lists & Structure Group */}
                 <BulletListToolbar />
                 <OrderedListToolbar />
                 <HorizontalRuleToolbar />
-                <Separator orientation="vertical" className="mx-1 h-7" />
 
                 {/* Alignment Group */}
-                <AlignmentTooolbar />
-                <Separator orientation="vertical" className="mx-1 h-7" />
+                <AlignmentToolbar />
 
                 {/* Media & Styling Group */}
                 <ImagePlaceholderToolbar />
-                <ColorHighlightToolbar />
-                <Separator orientation="vertical" className="mx-1 h-7" />
-
-                <div className="flex-1" />
 
                 {/* Utility Group */}
                 <SearchAndReplaceToolbar />

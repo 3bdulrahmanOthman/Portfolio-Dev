@@ -42,9 +42,13 @@ const uploadSchema = z.object({
 
 type ImageUploadFormProps = {
   onSuccess: (src: string, alt?: string) => void;
+  showAltField?: boolean;
 };
 
-export const ImageUploadForm = ({ onSuccess }: ImageUploadFormProps) => {
+export const ImageUploadForm = ({
+  onSuccess,
+  showAltField = true,
+}: ImageUploadFormProps) => {
   const [isPending, startTransition] = useTransition();
   const [files, setFiles] = useState<File[]>([]);
 
@@ -162,19 +166,24 @@ export const ImageUploadForm = ({ onSuccess }: ImageUploadFormProps) => {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="altText"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Alt Text</FormLabel>
-              <FormControl>
-                <Input placeholder="Alt text (optional)" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {showAltField && (
+          <FormField
+            control={form.control}
+            name="altText"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Alt Text</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Alt text (optional)"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
       </form>
     </Form>
   );

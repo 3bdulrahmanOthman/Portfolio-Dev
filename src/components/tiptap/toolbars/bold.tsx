@@ -3,53 +3,32 @@
 import { BoldIcon } from "lucide-react";
 import React from "react";
 
-import { Button, type ButtonProps } from "@/components/ui/button";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
 import { useToolbar } from "./toolbar-provider";
-// import type { Extension } from "@tiptap/core";
-// import type { StarterKitOptions } from "@tiptap/starter-kit";
+import { ButtonProps } from "@/components/ui/button";
+import { EditorButton } from "../_components/editor-button";
 
-// type StarterKitExtensions = Extension<StarterKitOptions>;
+export const BoldToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, onClick, children, ...props }, ref) => {
+    const { editor } = useToolbar();
+    const isActive = editor?.isActive("bold");
+    const canToggle = editor?.can().chain().focus().toggleBold().run();
 
-const BoldToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
-	({ className, onClick, children, ...props }, ref) => {
-		const { editor } = useToolbar();
-		return (
-			<Tooltip>
-				<TooltipTrigger asChild>
-					<Button
-						variant="ghost"
-						size="icon"
-						className={cn(
-							"size-8 p-0 sm:size-9",
-							editor?.isActive("bold") && "bg-accent",
-							className,
-						)}
-						onClick={(e) => {
-							editor?.chain().focus().toggleBold().run();
-							onClick?.(e);
-						}}
-						disabled={!editor?.can().chain().focus().toggleBold().run()}
-						ref={ref}
-						{...props}
-					>
-						{children ?? <BoldIcon className="size-4" />}
-					</Button>
-				</TooltipTrigger>
-				<TooltipContent>
-					<span>Bold</span>
-					<span className="ml-1 text-xs text-gray-11">(cmd + b)</span>
-				</TooltipContent>
-			</Tooltip>
-		);
-	},
+    return (
+      <EditorButton
+        className={className}
+        icon={children ?? <BoldIcon className="size-4" />}
+        isActive={isActive}
+        tooltip="Bold"
+        onClick={(e) => {
+          editor?.chain().focus().toggleBold().run();
+          onClick?.(e);
+        }}
+        disabled={!canToggle}
+        ref={ref}
+        {...props}
+      />
+    );
+  }
 );
 
 BoldToolbar.displayName = "BoldToolbar";
-
-export { BoldToolbar };

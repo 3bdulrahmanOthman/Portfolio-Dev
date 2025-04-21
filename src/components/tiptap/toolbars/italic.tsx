@@ -3,49 +3,32 @@
 import { ItalicIcon } from "lucide-react";
 import React from "react";
 
-import { Button, type ButtonProps } from "@/components/ui/button";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
 import { useToolbar } from "./toolbar-provider";
+import { ButtonProps } from "@/components/ui/button";
+import { EditorButton } from "../_components/editor-button";
 
-const ItalicToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
-	({ className, onClick, children, ...props }, ref) => {
-		const { editor } = useToolbar();
-		return (
-			<Tooltip>
-				<TooltipTrigger asChild>
-					<Button
-						variant="ghost"
-						size="icon"
-						className={cn(
-							"size-8 p-0 sm:size-9",
-							editor?.isActive("italic") && "bg-accent",
-							className,
-						)}
-						onClick={(e) => {
-							editor?.chain().focus().toggleItalic().run();
-							onClick?.(e);
-						}}
-						disabled={!editor?.can().chain().focus().toggleItalic().run()}
-						ref={ref}
-						{...props}
-					>
-						{children ?? <ItalicIcon className="size-4" />}
-					</Button>
-				</TooltipTrigger>
-				<TooltipContent>
-					<span>Italic</span>
-					<span className="ml-1 text-xs text-gray-11">(cmd + i)</span>
-				</TooltipContent>
-			</Tooltip>
-		);
-	},
+export const ItalicToolbar = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, onClick, children, ...props }, ref) => {
+    const { editor } = useToolbar();
+    const isActive = editor?.isActive("italic");
+    const canToggle = editor?.can().chain().focus().toggleItalic().run();
+
+    return (
+      <EditorButton
+        className={className}
+        icon={children ?? <ItalicIcon className="size-4" />}
+        isActive={isActive}
+        tooltip="Italic (⌘ + I)"
+        onClick={(e) => {
+          editor?.chain().focus().toggleItalic().run();
+          onClick?.(e);
+        }}
+        disabled={!canToggle}
+        ref={ref}
+        {...props}
+      />
+    );
+  }
 );
 
 ItalicToolbar.displayName = "ItalicToolbar";
-
-export { ItalicToolbar };
