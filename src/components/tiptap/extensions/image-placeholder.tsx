@@ -1,9 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  NODE_HANDLES_SELECTED_STYLE_CLASSNAME,
-} from "@/lib/tiptap-utils";
+import { NODE_HANDLES_SELECTED_STYLE_CLASSNAME } from "@/lib/tiptap-utils";
 import {
   type CommandProps,
   Node,
@@ -12,7 +10,7 @@ import {
   ReactNodeViewRenderer,
   mergeAttributes,
 } from "@tiptap/react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { EmptyCard } from "@/components/empty-card";
 import { Icons } from "@/components/icons";
 import {
@@ -80,8 +78,15 @@ export const ImagePlaceholder = Node.create<ImagePlaceholderOptions>({
 });
 
 function ImagePlaceholderComponent(props: NodeViewProps) {
-  const { editor } = props;
+  const { editor, deleteNode } = props;
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const onUploadSuccess = useCallback(
+    (src: string, alt?: string) => {
+      editor.chain().focus().setImage({ src, alt }).run();
+    },
+    [editor]
+  );
 
   return (
     <NodeViewWrapper className="w-full">
@@ -96,7 +101,7 @@ function ImagePlaceholderComponent(props: NodeViewProps) {
                 variant="ghost"
                 size="icon"
                 className="size-7 absolute right-2 top-2"
-                onClick={() => setIsExpanded(false)}
+                onClick={() => deleteNode()}
               >
                 <Icons.close />
               </Button>
@@ -133,7 +138,7 @@ function ImagePlaceholderComponent(props: NodeViewProps) {
               <TabsContent value="upload">
                 <ImageUploadForm
                   onSuccess={(src, alt) => {
-                    editor.chain().focus().setImage({ src, alt }).run();
+                    onUploadSuccess(src, alt);
                   }}
                 />
               </TabsContent>
@@ -141,11 +146,7 @@ function ImagePlaceholderComponent(props: NodeViewProps) {
               <TabsContent value="url">
                 <EmbedImageForm
                   onSubmitImage={(url, altText) => {
-                    editor
-                      .chain()
-                      .focus()
-                      .setImage({ src: url, alt: altText })
-                      .run();
+                    onUploadSuccess(url, altText);
                     setIsExpanded(false);
                   }}
                 />
