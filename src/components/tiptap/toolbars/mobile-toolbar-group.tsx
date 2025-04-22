@@ -23,9 +23,6 @@ export const MobileToolbarGroup: React.FC<MobileToolbarGroupProps> = ({
   children,
   className,
 }) => {
-  // const [isOpen, setIsOpen] = useState(false);
-
-  // const handleClose = () => setIsOpen(false);
 
   return (
     <Drawer>

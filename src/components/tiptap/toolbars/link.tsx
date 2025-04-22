@@ -89,8 +89,8 @@ export const LinkToolbar = React.forwardRef<
                 editor?.isActive("link") && "bg-accent",
                 className
               )}
-			  aria-label="Toolbar Link"
-			  type="button"
+              aria-label="Toolbar Link"
+              type="button"
               {...props}
             >
               <Link />

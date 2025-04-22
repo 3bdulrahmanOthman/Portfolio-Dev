@@ -19,14 +19,15 @@ import { Project } from "@/schemas";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
 interface ProjectTableProps {
-  promises: Promise<[Awaited<ReturnType<typeof getProjects>>]>;
+  initialData: Awaited<ReturnType<typeof getProjects>>;
 }
 
-export function ProjectsTable({ promises }: ProjectTableProps) {
+export function ProjectsTable({ initialData }: ProjectTableProps) {
   const router = useRouter();
-  const [{ data, pageCount }] = React.use(promises);
   const [rowAction, setRowAction] =
     React.useState<DataTableRowAction<Project> | null>(null);
+
+  const { data, pageCount } = initialData;
 
   const columns = React.useMemo(
     () =>

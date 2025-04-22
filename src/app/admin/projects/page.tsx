@@ -16,12 +16,10 @@ async function Projects(props: IndexPageProps) {
 
   const validFilters = getValidFilters(search.filters);
 
-  const promises = Promise.all([
-    getProjects({
-      ...search,
-      filters: validFilters,
-    }),
-  ]);
+  const projectData = await getProjects({
+    ...search,
+    filters: validFilters,
+  });
 
   return (
     <React.Suspense
@@ -29,7 +27,7 @@ async function Projects(props: IndexPageProps) {
         <DataTableSkeleton columnCount={7} filterCount={2} shrinkZero />
       }
     >
-      <ProjectsTable promises={promises} />
+      <ProjectsTable initialData={projectData} />
     </React.Suspense>
   );
 }

@@ -11,7 +11,6 @@ import { ToolbarProvider } from "../toolbars/toolbar-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { HeadingsToolbar } from "../toolbars/headings";
 import { BulletListToolbar } from "../toolbars/bullet-list";
 import { OrderedListToolbar } from "../toolbars/ordered-list";
@@ -39,7 +38,7 @@ export function FloatingToolbar({ editor }: { editor: Editor | null }) {
       <BubbleMenu
         key="mobile-toolbar" 
         tippyOptions={{
-          duration: 100,
+          duration: 0,
           placement: "bottom",
           offset: [0, 10],
         }}
@@ -48,26 +47,23 @@ export function FloatingToolbar({ editor }: { editor: Editor | null }) {
         className="w-full min-w-full mx-0 shadow-sm border rounded-sm bg-background"
       >
         <ToolbarProvider editor={editor}>
-          <ScrollArea className="h-fit w-full">
+          <ScrollArea className="w-full">
             <div className="flex items-center px-2 gap-0.5">
               <div className="flex items-center gap-0.5 p-1">
                 {/* Primary formatting */}
                 <BoldToolbar />
                 <ItalicToolbar />
                 <UnderlineToolbar />
-                <Separator orientation="vertical" className="h-6 mx-1" />
 
                 {/* Structure controls */}
                 <HeadingsToolbar />
                 <BulletListToolbar />
                 <OrderedListToolbar />
-                <Separator orientation="vertical" className="h-6 mx-1" />
 
                 {/* Rich formatting */}
                 <ColorHighlightToolbar />
                 <LinkToolbar />
                 <ImagePlaceholderToolbar />
-                <Separator orientation="vertical" className="h-6 mx-1" />
 
                 {/* Additional controls */}
                 <AlignmentToolbar />

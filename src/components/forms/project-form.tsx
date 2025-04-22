@@ -28,24 +28,24 @@ import { Shell } from "../shell";
 import { Icons } from "../icons";
 import { StarsBackground } from "../animate-ui/stars-background";
 import { ProjectImageUpload } from "../admin/project-image-upload";
-import { ProjectEditor } from "../tiptap/project-editor";
+import { TextEditor } from "../tiptap/text-editor";
 import { SidebarTrigger } from "../ui/sidebar";
 import { Project, ProjectSchema } from "@/schemas";
 
 interface ProjectFormProps {
-  project?: Project | null;
+  initialData?: Project | null;
 }
 
-export default function ProjectForm({ project }: ProjectFormProps) {
+export default function ProjectForm({ initialData }: ProjectFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const isEdit = !!project;
+  const isEdit = !!initialData;
   const form = useForm<Project>({
     resolver: zodResolver(ProjectSchema),
     defaultValues: isEdit
       ? {
-          ...project,
+          ...initialData,
         }
       : {
           title: "",
@@ -133,7 +133,7 @@ export default function ProjectForm({ project }: ProjectFormProps) {
                             placeholder="Project title"
                             onChange={(e) => {
                               field.onChange(e);
-                              if (!project?.slug) generateSlug();
+                              if (!initialData?.slug) generateSlug();
                             }}
                           />
                         </FormControl>
@@ -295,7 +295,7 @@ export default function ProjectForm({ project }: ProjectFormProps) {
                     <FormItem>
                       <FormLabel>Content</FormLabel>
                       <FormControl>
-                        <ProjectEditor
+                        <TextEditor
                           initialContent={field.value}
                           onChange={(val) =>
                             form.setValue("content", val, {

@@ -1,36 +1,39 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { EditorContent, useEditor } from "@tiptap/react"
-import StarterKit from "@tiptap/starter-kit"
-import Placeholder from "@tiptap/extension-placeholder"
-import TextAlign from "@tiptap/extension-text-align"
-import TextStyle from "@tiptap/extension-text-style"
-import Subscript from "@tiptap/extension-subscript"
-import Superscript from "@tiptap/extension-superscript"
-import Underline from "@tiptap/extension-underline"
-import Link from "@tiptap/extension-link"
-import Color from "@tiptap/extension-color"
-import Highlight from "@tiptap/extension-highlight"
-import Typography from "@tiptap/extension-typography"
+import { useEffect, useState } from "react";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Placeholder from "@tiptap/extension-placeholder";
+import TextAlign from "@tiptap/extension-text-align";
+import TextStyle from "@tiptap/extension-text-style";
+import Subscript from "@tiptap/extension-subscript";
+import Superscript from "@tiptap/extension-superscript";
+import Underline from "@tiptap/extension-underline";
+import Link from "@tiptap/extension-link";
+import Color from "@tiptap/extension-color";
+import Highlight from "@tiptap/extension-highlight";
+import Typography from "@tiptap/extension-typography";
 
-import { ImageExtension } from "@/components/tiptap/extensions/image"
-import { ImagePlaceholder } from "@/components/tiptap/extensions/image-placeholder"
-import SearchAndReplace from "@/components/tiptap/extensions/search-and-replace"
-import { TipTapFloatingMenu } from "@/components/tiptap/extensions/floating-menu"
-import { FloatingToolbar } from "@/components/tiptap/extensions/floating-toolbar"
-import { EditorToolbar } from "@/components/tiptap/toolbars/editor-toolbar"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { ImageExtension } from "@/components/tiptap/extensions/image";
+import { ImagePlaceholder } from "@/components/tiptap/extensions/image-placeholder";
+import SearchAndReplace from "@/components/tiptap/extensions/search-and-replace";
+import { TipTapFloatingMenu } from "@/components/tiptap/extensions/floating-menu";
+import { FloatingToolbar } from "@/components/tiptap/extensions/floating-toolbar";
+import { EditorToolbar } from "@/components/tiptap/toolbars/editor-toolbar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-import "./tiptap.css"
+import "./tiptap.css";
 
-interface ProjectEditorProps {
-  initialContent: string
-  onChange: (content: string) => void
+interface TextEditorProps {
+  initialContent: string;
+  onChange: (content: string) => void;
 }
 
-export function ProjectEditor({ initialContent, onChange }: ProjectEditorProps) {
-  const [isMounted, setIsMounted] = useState(false)
+export function TextEditor({
+  initialContent,
+  onChange,
+}: TextEditorProps) {
+  const [isMounted, setIsMounted] = useState(false);
 
   const extensions = [
     StarterKit.configure({
@@ -53,13 +56,13 @@ export function ProjectEditor({ initialContent, onChange }: ProjectEditorProps) 
       placeholder: ({ node }) => {
         switch (node.type.name) {
           case "heading":
-            return `Heading ${node.attrs.level}`
+            return `Heading ${node.attrs.level}`;
           case "detailsSummary":
-            return "Section title"
+            return "Section title";
           case "codeBlock":
-            return ""
+            return "";
           default:
-            return "Write, type '/' for commands"
+            return "Write, type '/' for commands";
         }
       },
       includeChildren: false,
@@ -80,7 +83,7 @@ export function ProjectEditor({ initialContent, onChange }: ProjectEditorProps) 
     ImagePlaceholder,
     SearchAndReplace,
     Typography,
-  ]
+  ];
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -92,14 +95,13 @@ export function ProjectEditor({ initialContent, onChange }: ProjectEditorProps) 
       },
     },
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML())
+      onChange(editor.getHTML());
     },
-  })
+  });
 
-  // Handle client-side mounting
   useEffect(() => {
-    setIsMounted(true)
-  }, [])
+    setIsMounted(true);
+  }, []);
 
   if (!isMounted) {
     return (
@@ -108,7 +110,7 @@ export function ProjectEditor({ initialContent, onChange }: ProjectEditorProps) 
           <div className="text-muted-foreground">Loading editor...</div>
         </div>
       </div>
-    )
+    );
   }
 
   if (!editor) {
@@ -118,7 +120,7 @@ export function ProjectEditor({ initialContent, onChange }: ProjectEditorProps) 
           <div className="text-muted-foreground">Editor failed to load</div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -126,9 +128,9 @@ export function ProjectEditor({ initialContent, onChange }: ProjectEditorProps) 
       <EditorToolbar editor={editor} />
       <FloatingToolbar editor={editor} />
       <TipTapFloatingMenu editor={editor} />
-      <ScrollArea className="h-80">
-        <EditorContent editor={editor}/>
+      <ScrollArea className="h-80 overflow-y-hidden">
+        <EditorContent editor={editor} />
       </ScrollArea>
     </div>
-  )
+  );
 }

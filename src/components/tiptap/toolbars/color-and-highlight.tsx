@@ -1,6 +1,5 @@
 "use client";
-/* eslint-disable */
-// @ts-nocheck
+
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -8,7 +7,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
   TooltipContent,
@@ -16,13 +14,9 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useToolbar } from "./toolbar-provider";
-import type { Extension } from "@tiptap/core";
-import type { ColorOptions } from "@tiptap/extension-color";
-import type { HighlightOptions } from "@tiptap/extension-highlight";
+
 import {
   Check,
-  CheckIcon,
-  ChevronDownIcon,
   ChevronsUpDown,
 } from "lucide-react";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -37,10 +31,6 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { Badge } from "@/components/ui/badge";
-
-type TextStylingExtensions =
-  | Extension<ColorOptions, any>
-  | Extension<HighlightOptions, any>;
 
 const TEXT_COLORS = [
   { name: "Default", color: "var(--editor-text-default)" },

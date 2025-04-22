@@ -24,4 +24,5 @@ export const CodeBlockToolbar = React.forwardRef<
     />
   );
 });
+
 CodeBlockToolbar.displayName = "CodeBlockToolbar";
