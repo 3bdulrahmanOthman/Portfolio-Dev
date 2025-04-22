@@ -56,6 +56,7 @@ export const HeadingsToolbar = React.forwardRef<
               editor?.chain().focus().toggleHeading({ level }).run()
             }
             active={editor?.isActive("heading", { level })}
+            aria-label={`H${level}`}
           >
             H{level}
           </MobileToolbarItem>

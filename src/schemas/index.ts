@@ -78,6 +78,8 @@ export const AboutSchema = z.object({
   id: z.string().optional(),
   title: z.string().min(1, "Title is required"),
   content: z.string().min(1, "Content is required"),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
 })
 
 export type About = z.infer<typeof AboutSchema>;
@@ -85,11 +87,13 @@ export type About = z.infer<typeof AboutSchema>;
 export const ContactSchema = z.object({
   id: z.string().optional(),
   email: z.string().email("Invalid email address"),
-  phone: z.string().optional(),
-  github: z.string().url().optional().or(z.literal("")),
-  linkedin: z.string().url().optional().or(z.literal("")),
-  twitter: z.string().url().optional().or(z.literal("")),
+  phone: z.string().nullable(),
+  github: z.string().url().nullable().or(z.literal("")),
+  linkedin: z.string().url().nullable().or(z.literal("")),
+  twitter: z.string().url().nullable().or(z.literal("")),
   content: z.string().min(1, "Content is required"),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
 })
 
 export type Contact = z.infer<typeof ContactSchema>;

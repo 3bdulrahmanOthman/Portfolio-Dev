@@ -135,6 +135,7 @@ export const ColorHighlightToolbar = () => {
                   variant={"outline"}
                   className="size-5 rounded-sm"
                   style={{ color }}
+                  aria-label={name}
                 >
                   A
                 </Badge>
@@ -150,6 +151,7 @@ export const ColorHighlightToolbar = () => {
               key={name}
               onClick={() => handleSetHighlight(color)}
               active={currentHighlight === color}
+              aria-label={name}
             >
               <div className="flex items-center space-x-2">
                 <Badge

@@ -1,31 +1,36 @@
 "use client";
 
 import { ChevronsUpDown } from "lucide-react";
-import { Button, ButtonProps } from "@/components/ui/button";
+import { Button, ButtonProps, buttonVariants } from "@/components/ui/button";
 import {
   Drawer,
   DrawerClose,
   DrawerContent,
+  DrawerDescription,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
+import React, { useState } from "react";
 
 interface MobileToolbarGroupProps {
   label: string;
+  description?: string;
   children: React.ReactNode;
   className?: string;
 }
 
 export const MobileToolbarGroup: React.FC<MobileToolbarGroupProps> = ({
   label,
+  description,
   children,
   className,
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Drawer>
+    <Drawer open={isOpen} onOpenChange={setIsOpen}>
       <DrawerTrigger asChild>
         <Button
           variant="ghost"
@@ -39,15 +44,16 @@ export const MobileToolbarGroup: React.FC<MobileToolbarGroupProps> = ({
           <ChevronsUpDown className="size-4" />
         </Button>
       </DrawerTrigger>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle className="text-center text-base font-semibold">
-            {label}
-          </DrawerTitle>
+      <DrawerContent
+        aria-hidden={!isOpen}
+        style={{ pointerEvents: isOpen ? "auto" : "none" }}
+      >
+        <DrawerHeader className="text-center">
+          <DrawerTitle>{label}</DrawerTitle>
+          <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>
-        <DrawerClose className="flex flex-col items-center  gap-2 py-3">
-          {children}
-        </DrawerClose>
+
+        <div className="flex flex-col p-4">{children}</div>
       </DrawerContent>
     </Drawer>
   );
@@ -65,10 +71,9 @@ export const MobileToolbarItem: React.FC<MobileToolbarItemProps> = ({
   ...props
 }) => {
   return (
-    <Button
-      variant="ghost"
-      size="sm"
+    <DrawerClose
       className={cn(
+        buttonVariants({ variant: "ghost", size: "sm" }),
         "h-8 w-full text-start",
         active && "bg-accent text-accent-foreground",
         className
@@ -79,6 +84,6 @@ export const MobileToolbarItem: React.FC<MobileToolbarItemProps> = ({
       {...props}
     >
       {children}
-    </Button>
+    </DrawerClose>
   );
 };
