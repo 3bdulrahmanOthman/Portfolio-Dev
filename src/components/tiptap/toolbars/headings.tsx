@@ -2,17 +2,13 @@
 
 import React from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 import { cn } from "@/lib/utils";
-import { useToolbar } from "./toolbar-provider";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { MobileToolbarGroup, MobileToolbarItem } from "./mobile-toolbar-group";
+import {
+  MobileToolbarGroup,
+  MobileToolbarItem,
+} from "../_components/mobile-toolbar-group";
 import {
   Popover,
   PopoverContent,
@@ -27,14 +23,21 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Editor } from "@tiptap/react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 
 const levels = [1, 2, 3, 4] as const;
 
+interface HeadingsToolbarProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  editor: Editor | null;
+}
+
 export const HeadingsToolbar = React.forwardRef<
   HTMLButtonElement,
-  React.ButtonHTMLAttributes<HTMLButtonElement>
->(({ className, ...props }, ref) => {
-  const { editor } = useToolbar();
+  HeadingsToolbarProps
+>(({ className, editor, ...props }, ref) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const activeLevel = levels.find((level) =>
     editor?.isActive("heading", { level })
@@ -68,7 +71,7 @@ export const HeadingsToolbar = React.forwardRef<
   return (
     <Popover>
       <div className="relative h-full">
-        <Tooltip>
+         <Tooltip>
           <TooltipTrigger asChild>
             <PopoverTrigger asChild>
               <Button
@@ -99,10 +102,8 @@ export const HeadingsToolbar = React.forwardRef<
               <ScrollArea className="h-[164px]">
                 <CommandGroup>
                   <CommandItem
-                    key={"normal"}
-                    onSelect={() =>
-                      editor?.chain().focus().setParagraph().run()
-                    }
+                    key="normal"
+                    onSelect={() => editor?.chain().focus().setParagraph().run()}
                     className="py-1"
                   >
                     Normal

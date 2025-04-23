@@ -28,7 +28,7 @@ import { Shell } from "../shell";
 import { Icons } from "../icons";
 import { StarsBackground } from "../animate-ui/stars-background";
 import { ProjectImageUpload } from "../admin/project-image-upload";
-import { TextEditor } from "../tiptap/text-editor";
+import { RichTextEditor } from "../tiptap/rich-text-editor";
 import { SidebarTrigger } from "../ui/sidebar";
 import { Project, ProjectSchema } from "@/schemas";
 
@@ -295,7 +295,7 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
                     <FormItem>
                       <FormLabel>Content</FormLabel>
                       <FormControl>
-                        <TextEditor
+                        <RichTextEditor
                           initialContent={field.value}
                           onChange={(val) =>
                             form.setValue("content", val, {

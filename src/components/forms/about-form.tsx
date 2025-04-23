@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Icons } from "@/components/icons";
-import { TextEditor } from "../tiptap/text-editor";
+import { RichTextEditor } from "../tiptap/rich-text-editor";
 
 interface AboutFormProps {
   initialData: Awaited<ReturnType<typeof getAbout>>;
@@ -79,7 +79,7 @@ export function AboutForm({ initialData }: AboutFormProps) {
                 <FormItem>
                   <FormLabel>Content</FormLabel>
                   <FormControl>
-                    <TextEditor
+                    <RichTextEditor
                       initialContent={field.value}
                       onChange={(val) =>
                         form.setValue("content", val, {

@@ -19,5 +19,5 @@ export default async function Page({
     notFound()
   }
 
-  return <ProjectForm project={project} />
+  return <ProjectForm initialData={project} />
 }

@@ -1,26 +1,19 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { useToolbar } from "./toolbar-provider";
-
-import {
-  Check,
-  ChevronsUpDown,
-} from "lucide-react";
+import { Editor } from "@tiptap/react";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { MobileToolbarGroup, MobileToolbarItem } from "./mobile-toolbar-group";
+import {
+  MobileToolbarGroup,
+  MobileToolbarItem,
+} from "../_components/mobile-toolbar-group";
 import {
   Command,
   CommandEmpty,
@@ -31,6 +24,12 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 
 const TEXT_COLORS = [
   { name: "Default", color: "var(--editor-text-default)" },
@@ -93,8 +92,13 @@ const ColorHighlightItem = ({
   </CommandItem>
 );
 
-export const ColorHighlightToolbar = () => {
-  const { editor } = useToolbar();
+interface ColorHighlightToolbarProps {
+  editor: Editor | null;
+}
+
+export const ColorHighlightToolbar = ({
+  editor,
+}: ColorHighlightToolbarProps) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   const currentColor = editor?.getAttributes("textStyle").color;

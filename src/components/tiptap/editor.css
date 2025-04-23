@@ -1,6 +1,18 @@
 
 :root {
   /* Color System */
+  --editor-highlight-default: hsl(0 0% 98%);
+  --editor-highlight-gray: hsl(240 5% 96%);
+  --editor-highlight-brown: hsl(43 96% 96%);
+  --editor-highlight-orange: hsl(33 100% 96%);
+  --editor-highlight-yellow: hsl(54 100% 96%);
+  --editor-highlight-green: hsl(142 71% 96%);
+  --editor-highlight-blue: hsl(217 91% 96%);
+  --editor-highlight-purple: hsl(269 97% 96%);
+  --editor-highlight-pink: hsl(336 80% 96%);
+  --editor-highlight-red: hsl(0 84% 96%);
+
+  /* Text Colors */
   --editor-text-default: hsl(240 10% 3.9%);
   --editor-text-gray: hsl(240 3.8% 46.1%);
   --editor-text-brown: hsl(25 95% 53%);
@@ -17,18 +29,6 @@
   --editor-bg-subtle: hsl(0 0% 98%);
   --editor-bg-muted: hsl(240 5% 96%);
   
-  /* Highlight Colors */
-  --editor-highlight-default: hsl(0 0% 98%);
-  --editor-highlight-gray: hsl(240 5% 96%);
-  --editor-highlight-brown: hsl(43 96% 96%);
-  --editor-highlight-orange: hsl(33 100% 96%);
-  --editor-highlight-yellow: hsl(54 100% 96%);
-  --editor-highlight-green: hsl(142 71% 96%);
-  --editor-highlight-blue: hsl(217 91% 96%);
-  --editor-highlight-purple: hsl(269 97% 96%);
-  --editor-highlight-pink: hsl(336 80% 96%);
-  --editor-highlight-red: hsl(0 84% 96%);
-
   /* Border Colors */
   --editor-border-default: hsl(240 5% 88%);
   --editor-border-strong: hsl(240 5% 65%);
@@ -72,20 +72,20 @@
   --editor-text-pink: hsl(336 80% 58%);
   --editor-text-red: hsl(0 84% 60%);
 
-  --editor-bg-default: hsl(240 10% 3.9%);
-  --editor-bg-subtle: hsl(240 3.7% 15.9%);
-  --editor-bg-muted: hsl(240 5% 26%);
-
   --editor-highlight-default: hsl(240 3.7% 15.9%);
   --editor-highlight-gray: hsl(240 5% 26%);
   --editor-highlight-brown: hsl(43 96% 10%);
-  --editor-highlight-orange: hsl(33 100% 10%);
+  --editor-highlight-orange: hsl(25 95% 53%);
   --editor-highlight-yellow: hsl(54 100% 10%);
   --editor-highlight-green: hsl(142 71% 10%);
   --editor-highlight-blue: hsl(217 91% 10%);
   --editor-highlight-purple: hsl(269 97% 10%);
   --editor-highlight-pink: hsl(336 80% 10%);
   --editor-highlight-red: hsl(0 84% 10%);
+
+  --editor-bg-default: hsl(240 10% 3.9%);
+  --editor-bg-subtle: hsl(240 3.7% 15.9%);
+  --editor-bg-muted: hsl(240 5% 26%);
 
   --editor-border-default: hsl(240 5% 26%);
   --editor-border-strong: hsl(240 5% 64.9%);
@@ -95,9 +95,9 @@
 .ProseMirror {
   caret-color: var(--editor-text-default);
   outline: none;
-  padding: var(--editor-spacing-16) var(--editor-spacing-8);
+  padding: var(--editor-spacing-8) var(--editor-spacing-16);
   margin: 0 auto;
-  max-width: 90ch;
+  /* max-width: 90ch; */
   font-family: var(--editor-font-sans);
   position: relative;
   /* background-color: var(--editor-bg-default); */

@@ -13,19 +13,17 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { useToolbar } from "./toolbar-provider";
 import { type SearchAndReplaceStorage } from "../extensions/search-and-replace";
 import { Badge } from "@/components/ui/badge";
 import { PopoverClose } from "@radix-ui/react-popover";
+import { ToolbarButton } from "../_components/toolbar-button";
+import { Editor } from "@tiptap/react";
 
-export function SearchAndReplaceToolbar() {
-  const { editor } = useToolbar();
+interface SearchAndReplaceToolbarProps {
+  editor: Editor | null;
+}
 
+export function SearchAndReplaceToolbar({ editor }: SearchAndReplaceToolbarProps) {
   const [open, setOpen] = useState(false);
   const [isReplacing, setIsReplacing] = useState(false);
   const [searchText, setSearchText] = useState("");
@@ -78,18 +76,12 @@ export function SearchAndReplaceToolbar() {
 
   return (
     <Popover open={open} onOpenChange={onOpenChange}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <PopoverTrigger disabled={!editor} asChild>
-            <Button variant="ghost" size="icon" className={"size-7"}>
-              <Repeat />
-            </Button>
-          </PopoverTrigger>
-        </TooltipTrigger>
-        <TooltipContent>
-          <span>Search & Replace</span>
-        </TooltipContent>
-      </Tooltip>
+      <PopoverTrigger disabled={!editor} asChild>
+        <ToolbarButton
+          Icon={Repeat}
+          tooltip="Search & Replace"
+        />
+      </PopoverTrigger>
 
       <PopoverContent
         align="end"
@@ -210,10 +202,7 @@ function ReplaceToolbarView({
 }) {
   return (
     <div className="relative w-full">
-      <PopoverClose
-        className="absolute right-0 top-0 cursor-pointer"
-        asChild
-      >
+      <PopoverClose className="absolute right-0 top-0 cursor-pointer" asChild>
         <Button variant={"ghost"} size={"icon"} className="size-7">
           <X />
         </Button>
