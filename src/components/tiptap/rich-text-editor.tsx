@@ -162,7 +162,7 @@ export function RichTextEditor({
         className
       )}
       style={
-        isFullscreen ? { padding: " ", background: "var(--background)" } : {}
+        isFullscreen ? { background: "var(--background)" } : {}
       }
       tabIndex={-1}
     >
@@ -176,30 +176,9 @@ export function RichTextEditor({
         )}
       />
 
-      <EditorToolbar
-        editor={editor}
-        withUndo
-        withRedo
-        withHeadings
-        withBold
-        withItalic
-        withUnderline
-        withStrikeThrough
-        withLink
-        withBulletList
-        withOrderedList
-        withBlockquote
-        withCode
-        withCodeBlock
-        withHorizontalRule
-        withImage
-        withHighlight
-        withSearch
-        withAlignment
-        withEraser
-      />
-
+      <EditorToolbar editor={editor} />
       <TipTapFloatingMenu editor={editor} />
+
       <ScrollArea
         className={cn(
           isFullscreen ? "h-full overflow-y-auto" : "h-80 overflow-y-hidden"

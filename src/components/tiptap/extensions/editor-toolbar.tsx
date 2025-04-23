@@ -29,54 +29,16 @@ import {
   UnderlineIcon,
   Undo2,
 } from "lucide-react";
-import { isToolActive } from "../utils";
+import { isExtensionEnabled, isToolActive } from "../utils";
 
 interface EditorToolbarProps {
   editor: Editor | null;
-  withUndo?: boolean;
-  withRedo?: boolean;
-  withHeadings?: boolean;
-  withBlockquote?: boolean;
-  withCode?: boolean;
-  withCodeBlock?: boolean;
-  withBold?: boolean;
-  withItalic?: boolean;
-  withUnderline?: boolean;
-  withStrikeThrough?: boolean;
-  withLink?: boolean;
-  withBulletList?: boolean;
-  withOrderedList?: boolean;
-  withHorizontalRule?: boolean;
-  withImage?: boolean;
-  withHighlight?: boolean;
-  withSearch?: boolean;
-  withAlignment?: boolean;
-  withEraser?: boolean;
   className?: string;
 }
 
 export const EditorToolbar = (props: EditorToolbarProps) => {
   const {
     editor,
-    withUndo,
-    withRedo,
-    withHeadings,
-    withBlockquote,
-    withCode,
-    withCodeBlock,
-    withBold,
-    withItalic,
-    withUnderline,
-    withStrikeThrough,
-    withLink,
-    withBulletList,
-    withOrderedList,
-    withHorizontalRule,
-    withImage,
-    withHighlight,
-    withSearch,
-    withAlignment,
-    withEraser,
     className,
   } = props;
 
@@ -94,19 +56,21 @@ export const EditorToolbar = (props: EditorToolbarProps) => {
               className
             )}
           >
-            {withEraser && (
-              <ToolbarButton
-                Icon={Eraser}
-                tooltip="Clear Formatting (⌘ + ⇧ + C)"
-                onClick={() =>
-                  editor?.chain().focus().clearNodes().unsetAllMarks().run()
-                }
-              />
-            )}
+            <ToolbarButton
+              Icon={Eraser}
+              tooltip="Clear Formatting (⌘ + ⇧ + C)"
+              onClick={() =>
+                editor?.chain().focus().clearNodes().unsetAllMarks().run()
+              }
+            />
 
-            {withHeadings && <HeadingsToolbar editor={editor} />}
-            {withHighlight && <ColorHighlightToolbar editor={editor} />}
-            {withBlockquote && (
+            {isExtensionEnabled(editor, "heading") && (
+              <HeadingsToolbar editor={editor} />
+            )}
+            {isExtensionEnabled(editor, "textStyle") && (
+              <ColorHighlightToolbar editor={editor} />
+            )}
+            {isExtensionEnabled(editor, "blockquote") && (
               <ToolbarButton
                 Icon={TextQuote}
                 isActive={isToolActive(editor, "blockquote")}
@@ -117,7 +81,7 @@ export const EditorToolbar = (props: EditorToolbarProps) => {
                 }
               />
             )}
-            {withCode && (
+            {isExtensionEnabled(editor, "code") && (
               <ToolbarButton
                 Icon={Code2}
                 isActive={isToolActive(editor, "code")}
@@ -126,7 +90,7 @@ export const EditorToolbar = (props: EditorToolbarProps) => {
                 disabled={!editor.can().chain().focus().toggleCode().run()}
               />
             )}
-            {withCodeBlock && (
+            {isExtensionEnabled(editor, "codeBlock") && (
               <ToolbarButton
                 Icon={Code}
                 isActive={isToolActive(editor, "codeBlock")}
@@ -135,7 +99,7 @@ export const EditorToolbar = (props: EditorToolbarProps) => {
                 disabled={!editor.can().chain().focus().toggleCodeBlock().run()}
               />
             )}
-            {withBold && (
+            {isExtensionEnabled(editor, "bold") && (
               <ToolbarButton
                 Icon={BoldIcon}
                 isActive={isToolActive(editor, "bold")}
@@ -144,7 +108,7 @@ export const EditorToolbar = (props: EditorToolbarProps) => {
                 disabled={!editor.can().chain().focus().toggleBold().run()}
               />
             )}
-            {withItalic && (
+            {isExtensionEnabled(editor, "italic") && (
               <ToolbarButton
                 Icon={ItalicIcon}
                 isActive={isToolActive(editor, "italic")}
@@ -153,7 +117,7 @@ export const EditorToolbar = (props: EditorToolbarProps) => {
                 disabled={!editor.can().chain().focus().toggleItalic().run()}
               />
             )}
-            {withUnderline && (
+            {isExtensionEnabled(editor, "underline") && (
               <ToolbarButton
                 Icon={UnderlineIcon}
                 isActive={isToolActive(editor, "underline")}
@@ -162,7 +126,7 @@ export const EditorToolbar = (props: EditorToolbarProps) => {
                 disabled={!editor.can().chain().focus().toggleUnderline().run()}
               />
             )}
-            {withStrikeThrough && (
+            {isExtensionEnabled(editor, "strike") && (
               <ToolbarButton
                 Icon={Strikethrough}
                 isActive={isToolActive(editor, "strike")}
@@ -171,8 +135,10 @@ export const EditorToolbar = (props: EditorToolbarProps) => {
                 disabled={!editor.can().chain().focus().toggleStrike().run()}
               />
             )}
-            {withLink && <LinkToolbar editor={editor} />}
-            {withBulletList && (
+            {isExtensionEnabled(editor, "link") && (
+              <LinkToolbar editor={editor} />
+            )}
+            {isExtensionEnabled(editor, "bulletList") && (
               <ToolbarButton
                 Icon={List}
                 isActive={isToolActive(editor, "bulletList")}
@@ -183,7 +149,7 @@ export const EditorToolbar = (props: EditorToolbarProps) => {
                 }
               />
             )}
-            {withOrderedList && (
+            {isExtensionEnabled(editor, "orderedList") && (
               <ToolbarButton
                 Icon={ListOrdered}
                 isActive={isToolActive(editor, "orderedList")}
@@ -194,14 +160,14 @@ export const EditorToolbar = (props: EditorToolbarProps) => {
                 }
               />
             )}
-            {withHorizontalRule && (
+            {isExtensionEnabled(editor, "horizontalRule") && (
               <ToolbarButton
                 Icon={SeparatorHorizontal}
                 tooltip="Horizontal Rule"
                 onClick={() => editor.chain().focus().setHorizontalRule().run()}
               />
             )}
-            {withImage && (
+            {isExtensionEnabled(editor, "image-placeholder") && (
               <ToolbarButton
                 Icon={ImageIcon}
                 isActive={isToolActive(editor, "image-placeholder")}
@@ -214,27 +180,27 @@ export const EditorToolbar = (props: EditorToolbarProps) => {
               />
             )}
 
-            {withSearch && <SearchAndReplaceToolbar editor={editor} />}
-            {withAlignment && <AlignmentToolbar editor={editor} />}
+            {isExtensionEnabled(editor, "searchAndReplace") && (
+              <SearchAndReplaceToolbar editor={editor} />
+            )}
+            {isExtensionEnabled(editor, "textAlign") && (
+              <AlignmentToolbar editor={editor} />
+            )}
 
             <div className="ml-auto"></div>
 
-            {withUndo && (
-              <ToolbarButton
-                Icon={Undo2}
-                tooltip="Undo"
-                onClick={() => editor.chain().focus().undo().run()}
-                disabled={!editor.can().chain().focus().undo().run()}
-              />
-            )}
-            {withRedo && (
-              <ToolbarButton
-                Icon={Redo2}
-                tooltip="Redo"
-                onClick={() => editor.chain().focus().redo().run()}
-                disabled={!editor.can().chain().focus().redo().run()}
-              />
-            )}
+            <ToolbarButton
+              Icon={Undo2}
+              tooltip="Undo"
+              onClick={() => editor.chain().focus().undo().run()}
+              disabled={!editor.can().chain().focus().undo().run()}
+            />
+            <ToolbarButton
+              Icon={Redo2}
+              tooltip="Redo"
+              onClick={() => editor.chain().focus().redo().run()}
+              disabled={!editor.can().chain().focus().redo().run()}
+            />
           </div>
           <ScrollBar className="size-full opacity-0" orientation="horizontal" />
         </ScrollArea>
