@@ -13,7 +13,7 @@ async function About() {
       header={
         <>
           <SidebarTrigger className="mr-4" />
-          <span className="text-sm">Edit About Page</span>
+          <h1 className="font-bold">Edit About Page</h1>
         </>
       }
     >

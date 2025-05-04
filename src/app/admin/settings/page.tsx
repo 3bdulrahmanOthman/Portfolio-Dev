@@ -7,10 +7,10 @@ function Settings() {
   return (
     <AppContentLayout
       header={
-        <div className="flex justify-between gap-4">
+        <>
           <SidebarTrigger />
-          <span className="text-sm">Manage your settings</span>
-        </div>
+          <h1 className="font-bold">Manage your settings</h1>
+        </>
       }
     >
       <SettingsForm />

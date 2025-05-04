@@ -13,7 +13,7 @@ async function Contact() {
       header={
         <>
           <SidebarTrigger className="mr-4" />
-          <span className="text-sm">Edit Contact Page</span>
+          <h1 className="font-bold">Edit Contact Page</h1>
         </>
       }
     >

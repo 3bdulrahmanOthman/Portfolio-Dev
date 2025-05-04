@@ -106,7 +106,7 @@ export const LinkToolbar = React.forwardRef<
         <TooltipContent>Insert or edit link</TooltipContent>
       </Tooltip>
 
-      <PopoverContent className="p-2 w-auto" sideOffset={8} align="start">
+      <PopoverContent className="p-2 w-full" sideOffset={8} align="start">
         <Form {...form}>
           <form
             onSubmit={(e) => {

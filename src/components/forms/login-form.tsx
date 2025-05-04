@@ -1,110 +1,89 @@
 "use client";
 
-import * as z from "zod";
+import { useCallback, useTransition } from "react";
+import { useSearchParams } from "next/navigation";
+import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTransition, useState } from "react";
-import { useSession } from "next-auth/react";
+import { showErrorToast } from "@/lib/handle-error";
 
-import { SettingsSchema } from "@/schemas";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/password-input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Form,
-  FormField,
   FormControl,
+  FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { PasswordInput } from "@/components/password-input";
-import { Button } from "@/components/ui/button";
-import { getErrorMessage } from "@/lib/handle-error";
-import { settings } from "@/actions/settings";
-import { Shell } from "../shell";
 import { Icons } from "../icons";
-import { Alert, AlertTitle } from "../ui/alert";
+import { LoginSchema } from "@/schemas";
+import { login } from "@/actions/login";
 
-type Settings = z.infer<typeof SettingsSchema>;
+type LoginFormValues = z.infer<typeof LoginSchema>;
 
-export default function SettingsForm() {
-  const { data, update } = useSession();
-
-  const [status, setStatus] = useState({ error: "", success: "" });
+export default function SignInForm() {
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
   const [isPending, startTransition] = useTransition();
 
-  const form = useForm<Settings>({
-    resolver: zodResolver(SettingsSchema),
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(LoginSchema),
     defaultValues: {
-      password: undefined,
-      newPassword: undefined,
-      newPasswordConfirmation: undefined,
-      name: data?.user?.name || "",
-      email: data?.user?.email || "",
+      email: "admin@mail.com",
+      password: "123456",
     },
+    mode: "onSubmit",
   });
 
-  const onSubmit = async (values: Settings) => {
-    setStatus({ error: "", success: "" });
+  const onSubmit = useCallback(
+    (values: LoginFormValues) => {
+      startTransition(async () => {
+        const result = await login(values, callbackUrl);
 
-    startTransition(() => {
-      settings(values)
-        .then(async (res) => {
-          if (res.error) return setStatus({ error: res.error, success: "" });
-          if (res.success) {
-            await update();
-            setStatus({ error: "", success: res.success });
-          }
-        })
-        .catch((err) => {
-          setStatus({ error: getErrorMessage(err), success: "" });
-        });
-    });
-  };
+        if (result?.error) {
+          return showErrorToast(result.error);  
+        }
+      });
+    },
+    [callbackUrl]
+  );
 
   return (
-    <Shell variant="sidebar" className="px-6">
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="h-[calc(100svh-140px)] md:h-[calc(100svh-160px)] space-y-6"
-        >
-          <div className="h-full space-y-4">
-            {/* Name Field */}
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Name"
-                      disabled={isPending}
-                      autoComplete="name"
-                      value={field.value ?? ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+    <Card className="w-full border-border/10">
+      <CardHeader className="flex flex-col items-center">
+        <Icons.shieldAlert className="size-16 text-primary" />
+        <CardTitle className="text-2xl">Admin Login</CardTitle>
+        <CardDescription>
+          Welcome back! Please sign in to continue
+        </CardDescription>
+      </CardHeader>
 
-            {/* Email Field */}
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <Label htmlFor="email">Email</Label>
                   <FormControl>
                     <Input
-                      {...field}
-                      placeholder="Email"
+                      id="email"
                       type="email"
-                      disabled={isPending}
+                      placeholder="you@example.com"
                       autoComplete="email"
-                      value={field.value ?? ""}
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -112,62 +91,18 @@ export default function SettingsForm() {
               )}
             />
 
-            {/* Current Password Field */}
             <FormField
               control={form.control}
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <Label htmlFor="password">Password</Label>
                   <FormControl>
                     <PasswordInput
-                      {...field}
-                      placeholder="Password"
-                      disabled={isPending}
-                      autoComplete="current-password"
-                      value={field.value ?? ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* New Password Field */}
-            <FormField
-              control={form.control}
-              name="newPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>New Password</FormLabel>
-                  <FormControl>
-                    <PasswordInput
-                      {...field}
-                      placeholder="New Password"
-                      disabled={isPending}
+                      id="password"
+                      placeholder="••••••••"
                       autoComplete="new-password"
-                      value={field.value ?? ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Confirm New Password Field */}
-            <FormField
-              control={form.control}
-              name="newPasswordConfirmation"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>New Password Confirmation</FormLabel>
-                  <FormControl>
-                    <PasswordInput
                       {...field}
-                      placeholder="Confirm New Password"
-                      disabled={isPending}
-                      autoComplete="new-password"
-                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />
@@ -175,40 +110,23 @@ export default function SettingsForm() {
               )}
             />
 
-            {/* Alerts */}
-            <div className="space-y-4">
-              {status.error && (
-                <Alert variant="destructive" withBackground>
-                  <Icons.triangleAlert className="size-4" />
-                  <AlertTitle>{status.error}</AlertTitle>
-                </Alert>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={form.formState.isSubmitting || isPending}
+            >
+              {form.formState.isSubmitting || isPending ? (
+                <>
+                  <Icons.spinner className="mr-2 size-4 animate-spin" />
+                  <span>Logging in...</span>
+                </>
+              ) : (
+                "Login"
               )}
-              {status.success && (
-                <Alert variant="success" withBackground>
-                  <Icons.checkCircled className="size-4" />
-                  <AlertTitle>{status.success}</AlertTitle>
-                </Alert>
-              )}
-            </div>
-          </div>
-
-          <Button
-            type="submit"
-            disabled={isPending}
-            className="w-full mt-auto"
-            size="sm"
-          >
-            {isPending ? (
-              <>
-                <Icons.spinner className="size-4 text-muted-foreground animate-spin" />
-                <span>Saving...</span>
-              </>
-            ) : (
-              <span>Save</span>
-            )}
-          </Button>
-        </form>
-      </Form>
-    </Shell>
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }

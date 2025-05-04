@@ -53,19 +53,19 @@ export function ProjectsTable({ initialData }: ProjectTableProps) {
   return (
     <AppContentLayout
       header={
-        <div className="w-full flex justify-between gap-4">
+        <>
           <SidebarTrigger />
           <Button
             size="sm"
             variant={"default"}
-            className="h-7 cursor-pointer"
+            className="h-7 cursor-pointer ml-auto"
             aria-label="Create new project"
             onClick={() => router.push("/admin/projects/new")}
           >
             <Icons.boxPlus className="size-4" />
             Create Project
           </Button>
-        </div>
+        </>
       }
     >
       <DataTable

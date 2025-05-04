@@ -108,9 +108,9 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
       header={
         <>
           <SidebarTrigger className="mr-4" />
-          <span className="text-sm">
+          <h1 className="font-bold">
             {isEdit ? "Edit Project" : "Create New Project"}
-          </span>
+          </h1>
         </>
       }
     >
