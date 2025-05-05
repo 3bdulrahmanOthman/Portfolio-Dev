@@ -8,26 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Conversation {
-  id         String    @id @default(cuid())
-  sessionId  String    @unique
-  email      String    
-  verified   Boolean   @default(false)
-  status     String    @default("active") // active, archived
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  messages   Message[]
-}
-
-model Message {
-  id             String       @id @default(cuid())
-  content        String
-  senderType     String       // visitor, admin
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  conversationId String
-  createdAt      DateTime     @default(now())
-}
-
 model User {
   id            String    @id @default(cuid())
   name          String?

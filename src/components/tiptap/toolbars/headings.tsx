@@ -24,7 +24,11 @@ import {
 } from "@/components/ui/command";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Editor } from "@tiptap/react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 
 const levels = [1, 2, 3, 4] as const;
@@ -71,18 +75,15 @@ export const HeadingsToolbar = React.forwardRef<
   return (
     <Popover>
       <div className="relative h-full">
-         <Tooltip>
+        <Tooltip>
           <TooltipTrigger asChild>
             <PopoverTrigger asChild>
               <Button
                 aria-label="Toggle headings"
                 role="combobox"
-                variant="ghost"
+                variant={editor?.isActive("heading") ? "secondary" : "ghost"}
                 size="sm"
-                className={
-                  (cn("ml-auto", editor?.isActive("heading") && "bg-accent"),
-                  className)
-                }
+                className={cn("ml-auto h-7 sm:h-8 cursor-pointer", className)}
                 ref={ref}
                 {...props}
               >
@@ -103,7 +104,9 @@ export const HeadingsToolbar = React.forwardRef<
                 <CommandGroup>
                   <CommandItem
                     key="normal"
-                    onSelect={() => editor?.chain().focus().setParagraph().run()}
+                    onSelect={() =>
+                      editor?.chain().focus().setParagraph().run()
+                    }
                     className="py-1"
                   >
                     Normal

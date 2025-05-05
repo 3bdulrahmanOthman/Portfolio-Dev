@@ -12,7 +12,7 @@ import {
   FileVideoIcon,
 } from "lucide-react";
 import * as React from "react";
-import Image from "next/image";
+import NextImage from "next/image";
 
 const ROOT_NAME = "FileUpload";
 const DROPZONE_NAME = "FileUploadDropzone";
@@ -249,8 +249,8 @@ function useStoreContext(name: keyof typeof FILE_UPLOAD_ERRORS) {
 function useStore<T>(selector: (state: StoreState) => T): T {
   const store = useStoreContext(ROOT_NAME);
 
-  const lastValueRef = React.useRef<{ value: T; state: StoreState } | null>(
-    null
+  const lastValueRef = useLazyRef<{ value: T; state: StoreState } | null>(
+    () => null
   );
 
   const getSnapshot = React.useCallback(() => {
@@ -264,7 +264,7 @@ function useStore<T>(selector: (state: StoreState) => T): T {
     const nextValue = selector(state);
     lastValueRef.current = { value: nextValue, state };
     return nextValue;
-  }, [store, selector]);
+  }, [store, selector, lastValueRef]);
 
   return React.useSyncExternalStore(store.subscribe, getSnapshot, getSnapshot);
 }
@@ -388,7 +388,18 @@ const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootProps>(
       [dropzoneId, inputId, listId, labelId, dir, disabled]
     );
 
-    // Define onFilesUpload before it's used
+    React.useEffect(() => {
+      if (isControlled) {
+        store.dispatch({ variant: "SET_FILES", files: value });
+      } else if (
+        defaultValue &&
+        defaultValue.length > 0 &&
+        !store.getState().files.size
+      ) {
+        store.dispatch({ variant: "SET_FILES", files: defaultValue });
+      }
+    }, [value, defaultValue, isControlled, store]);
+
     const onFilesUpload = React.useCallback(
       async (files: File[]) => {
         try {
@@ -433,21 +444,8 @@ const FileUploadRoot = React.forwardRef<HTMLDivElement, FileUploadRootProps>(
           }
         }
       },
-      [store, propsRef]
+      [propsRef, store]
     );
-
-    React.useEffect(() => {
-      if (isControlled) {
-        store.dispatch({ variant: "SET_FILES", files: value });
-      } else if (
-        defaultValue &&
-        defaultValue.length > 0 &&
-        !store.getState().files.size
-      ) {
-        store.dispatch({ variant: "SET_FILES", files: defaultValue });
-      }
-    }, [value, defaultValue, isControlled, store]);
-
     const onFilesChange = React.useCallback(
       (originalFiles: File[]) => {
         if (propsRef.current.disabled) return;
@@ -672,7 +670,7 @@ const FileUploadDropzone = React.forwardRef<
       event.preventDefault();
       store.dispatch({ variant: "SET_DRAG_OVER", dragOver: true });
     },
-    [store, propsRef]
+    [propsRef, store]
   );
 
   const onDragEnter = React.useCallback(
@@ -684,7 +682,7 @@ const FileUploadDropzone = React.forwardRef<
       event.preventDefault();
       store.dispatch({ variant: "SET_DRAG_OVER", dragOver: true });
     },
-    [store, propsRef]
+    [propsRef, store]
   );
 
   const onDragLeave = React.useCallback(
@@ -693,10 +691,19 @@ const FileUploadDropzone = React.forwardRef<
 
       if (event.defaultPrevented) return;
 
+      const relatedTarget = event.relatedTarget;
+      if (
+        relatedTarget &&
+        relatedTarget instanceof Node &&
+        event.currentTarget.contains(relatedTarget)
+      ) {
+        return;
+      }
+
       event.preventDefault();
       store.dispatch({ variant: "SET_DRAG_OVER", dragOver: false });
     },
-    [store, propsRef]
+    [propsRef, store]
   );
 
   const onDrop = React.useCallback(
@@ -709,6 +716,45 @@ const FileUploadDropzone = React.forwardRef<
       store.dispatch({ variant: "SET_DRAG_OVER", dragOver: false });
 
       const files = Array.from(event.dataTransfer.files);
+      const inputElement = context.inputRef.current;
+      if (!inputElement) return;
+
+      const dataTransfer = new DataTransfer();
+      for (const file of files) {
+        dataTransfer.items.add(file);
+      }
+
+      inputElement.files = dataTransfer.files;
+      inputElement.dispatchEvent(new Event("change", { bubbles: true }));
+    },
+    [propsRef, store, context.inputRef]
+  );
+
+  const onPaste = React.useCallback(
+    (event: React.ClipboardEvent<HTMLDivElement>) => {
+      propsRef.current?.onPaste?.(event);
+
+      if (event.defaultPrevented) return;
+
+      event.preventDefault();
+      store.dispatch({ variant: "SET_DRAG_OVER", dragOver: false });
+
+      const items = event.clipboardData?.items;
+      if (!items) return;
+
+      const files: File[] = [];
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (item?.kind === "file") {
+          const file = item.getAsFile();
+          if (file) {
+            files.push(file);
+          }
+        }
+      }
+
+      if (files.length === 0) return;
+
       const inputElement = context.inputRef.current;
       if (!inputElement) return;
 
@@ -741,18 +787,21 @@ const FileUploadDropzone = React.forwardRef<
   const DropzonePrimitive = asChild ? Slot : "div";
 
   return (
+    // eslint-disable-next-line jsx-a11y/role-supports-aria-props
     <DropzonePrimitive
       role="region"
       id={context.dropzoneId}
       aria-controls={`${context.inputId} ${context.listId}`}
+      aria-disabled={context.disabled}
+      aria-invalid={invalid}
       data-disabled={context.disabled ? "" : undefined}
       data-dragging={dragOver ? "" : undefined}
       data-invalid={invalid ? "" : undefined}
       data-slot="file-upload-dropzone"
       dir={context.dir}
+      tabIndex={context.disabled ? undefined : 0}
       {...dropzoneProps}
       ref={forwardedRef}
-      tabIndex={context.disabled ? undefined : 0}
       className={cn(
         "relative flex select-none flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-6 outline-none transition-colors hover:bg-accent/30 focus-visible:border-ring/50 data-[disabled]:pointer-events-none data-[dragging]:border-primary data-[invalid]:border-destructive data-[invalid]:ring-destructive/20",
         className
@@ -763,6 +812,7 @@ const FileUploadDropzone = React.forwardRef<
       onDragOver={onDragOver}
       onDrop={onDrop}
       onKeyDown={onKeyDown}
+      onPaste={onPaste}
     />
   );
 });
@@ -826,7 +876,6 @@ const FileUploadList = React.forwardRef<HTMLDivElement, FileUploadListProps>(
     } = props;
 
     const context = useFileUploadContext(LIST_NAME);
-
     const hasFiles = useStore((state) => state.files.size > 0);
 
     const shouldRender = forceMount || hasFiles;
@@ -836,9 +885,11 @@ const FileUploadList = React.forwardRef<HTMLDivElement, FileUploadListProps>(
     const ListPrimitive = asChild ? Slot : "div";
 
     return (
+      // eslint-disable-next-line jsx-a11y/role-supports-aria-props
       <ListPrimitive
         role="list"
         id={context.listId}
+        aria-orientation={orientation}
         data-orientation={orientation}
         data-slot="file-upload-list"
         data-state={shouldRender ? "active" : "inactive"}
@@ -939,7 +990,7 @@ const FileUploadItem = React.forwardRef<HTMLDivElement, FileUploadItemProps>(
           {...itemProps}
           ref={forwardedRef}
           className={cn(
-            "relative flex items-center gap-2.5 rounded-md border p-3 has-[_[data-slot=file-upload-progress]]:flex-col has-[_[data-slot=file-upload-progress]]:items-start",
+            "relative flex items-center gap-2.5 rounded-md border p-3",
             className
           )}
         >
@@ -1030,32 +1081,27 @@ const FileUploadItemPreview = React.forwardRef<
 
   const itemContext = useFileUploadItemContext(ITEM_PREVIEW_NAME);
 
-  const isImage = itemContext.fileState?.file.type.startsWith("image/");
-
   const onPreviewRender = React.useCallback(
     (file: File) => {
       if (render) return render(file);
 
-      if (isImage) {
-        // Using Next.js Image component instead of img
+      if (itemContext.fileState?.file.type.startsWith("image/")) {
         const objectUrl = URL.createObjectURL(file);
         return (
-          <div className="relative size-full">
-            <Image
-              src={objectUrl || "/placeholder.svg"}
-              alt={file.name}
-              fill
-              className="rounded object-cover"
-              onLoadingComplete={() => URL.revokeObjectURL(objectUrl)}
-              crossOrigin="anonymous"
-            />
-          </div>
+          <NextImage
+            src={URL.createObjectURL(file) || "/placeholder.svg"}
+            alt={file.name}
+            fill
+            className="rounded object-cover"
+            onLoadingComplete={() => URL.revokeObjectURL(objectUrl)}
+            crossOrigin="anonymous"
+          />
         );
       }
 
       return getFileIcon(file);
     },
-    [isImage, render]
+    [render, itemContext.fileState?.file.type]
   );
 
   if (!itemContext.fileState) return null;
@@ -1069,8 +1115,7 @@ const FileUploadItemPreview = React.forwardRef<
       {...previewProps}
       ref={forwardedRef}
       className={cn(
-        "relative flex size-10 shrink-0 items-center justify-center rounded-md",
-        isImage ? "object-cover" : "bg-accent/50 [&>svg]:size-7",
+        "relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded border bg-accent/50 [&>svg]:size-10",
         className
       )}
     >
@@ -1084,13 +1129,20 @@ FileUploadItemPreview.displayName = ITEM_PREVIEW_NAME;
 interface FileUploadItemMetadataProps
   extends React.ComponentPropsWithoutRef<"div"> {
   asChild?: boolean;
+  size?: "default" | "sm";
 }
 
 const FileUploadItemMetadata = React.forwardRef<
   HTMLDivElement,
   FileUploadItemMetadataProps
 >((props, forwardedRef) => {
-  const { asChild, children, className, ...metadataProps } = props;
+  const {
+    asChild,
+    size = "default",
+    children,
+    className,
+    ...metadataProps
+  } = props;
 
   const context = useFileUploadContext(ITEM_METADATA_NAME);
   const itemContext = useFileUploadItemContext(ITEM_METADATA_NAME);
@@ -1111,13 +1163,19 @@ const FileUploadItemMetadata = React.forwardRef<
         <>
           <span
             id={itemContext.nameId}
-            className="truncate font-medium text-sm"
+            className={cn(
+              "truncate font-medium text-sm",
+              size === "sm" && "font-normal text-[13px] leading-snug"
+            )}
           >
             {itemContext.fileState.file.name}
           </span>
           <span
             id={itemContext.sizeId}
-            className="text-muted-foreground text-xs"
+            className={cn(
+              "truncate text-muted-foreground text-xs",
+              size === "sm" && "text-[11px]"
+            )}
           >
             {formatBytes(itemContext.fileState.file.size)}
           </span>
@@ -1139,99 +1197,140 @@ FileUploadItemMetadata.displayName = ITEM_METADATA_NAME;
 interface FileUploadItemProgressProps
   extends React.ComponentPropsWithoutRef<"div"> {
   asChild?: boolean;
-  circular?: boolean;
+  variant?: "linear" | "circular" | "fill";
   size?: number;
+  forceMount?: boolean;
 }
 
 const FileUploadItemProgress = React.forwardRef<
   HTMLDivElement,
   FileUploadItemProgressProps
 >((props, forwardedRef) => {
-  const { circular, size = 40, asChild, className, ...progressProps } = props;
+  const {
+    variant = "linear",
+    size = 40,
+    asChild,
+    forceMount,
+    className,
+    ...progressProps
+  } = props;
 
   const itemContext = useFileUploadItemContext(ITEM_PROGRESS_NAME);
 
   if (!itemContext.fileState) return null;
 
+  const shouldRender = forceMount || itemContext.fileState.progress !== 100;
+
+  if (!shouldRender) return null;
+
   const ItemProgressPrimitive = asChild ? Slot : "div";
 
-  if (circular) {
-    if (itemContext.fileState.status === "success") return null;
+  switch (variant) {
+    case "circular": {
+      const circumference = 2 * Math.PI * ((size - 4) / 2);
+      const strokeDashoffset =
+        circumference - (itemContext.fileState.progress / 100) * circumference;
 
-    const circumference = 2 * Math.PI * ((size - 4) / 2);
-    const strokeDashoffset =
-      circumference - (itemContext.fileState.progress / 100) * circumference;
-
-    return (
-      <ItemProgressPrimitive
-        role="progressbar"
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={itemContext.fileState.progress}
-        aria-valuetext={`${itemContext.fileState.progress}%`}
-        aria-labelledby={itemContext.nameId}
-        data-slot="file-upload-progress"
-        {...progressProps}
-        ref={forwardedRef}
-        className={cn(
-          "-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2",
-          className
-        )}
-      >
-        <svg
-          className="rotate-[-90deg] transform"
-          width={size}
-          height={size}
-          viewBox={`0 0 ${size} ${size}`}
-          fill="none"
-          stroke="currentColor"
+      return (
+        <ItemProgressPrimitive
+          role="progressbar"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={itemContext.fileState.progress}
+          aria-valuetext={`${itemContext.fileState.progress}%`}
+          aria-labelledby={itemContext.nameId}
+          data-slot="file-upload-progress"
+          {...progressProps}
+          ref={forwardedRef}
+          className={cn(
+            "-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2",
+            className
+          )}
         >
-          <circle
-            className="text-primary/20"
-            strokeWidth="2"
-            cx={size / 2}
-            cy={size / 2}
-            r={(size - 4) / 2}
-          />
-          <circle
-            className="text-primary transition-all"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeDasharray={circumference}
-            strokeDashoffset={strokeDashoffset}
-            cx={size / 2}
-            cy={size / 2}
-            r={(size - 4) / 2}
-          />
-        </svg>
-      </ItemProgressPrimitive>
-    );
-  }
+          <svg
+            className="rotate-[-90deg] transform"
+            width={size}
+            height={size}
+            viewBox={`0 0 ${size} ${size}`}
+            fill="none"
+            stroke="currentColor"
+          >
+            <circle
+              className="text-primary/20"
+              strokeWidth="2"
+              cx={size / 2}
+              cy={size / 2}
+              r={(size - 4) / 2}
+            />
+            <circle
+              className="text-primary transition-[stroke-dashoffset] duration-300 ease-linear"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeDasharray={circumference}
+              strokeDashoffset={strokeDashoffset}
+              cx={size / 2}
+              cy={size / 2}
+              r={(size - 4) / 2}
+            />
+          </svg>
+        </ItemProgressPrimitive>
+      );
+    }
 
-  return (
-    <ItemProgressPrimitive
-      role="progressbar"
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-valuenow={itemContext.fileState.progress}
-      aria-valuetext={`${itemContext.fileState.progress}%`}
-      aria-labelledby={itemContext.nameId}
-      data-slot="file-upload-progress"
-      {...progressProps}
-      ref={forwardedRef}
-      className={cn(
-        "relative h-1.5 w-full overflow-hidden rounded-full bg-primary/20",
-        className
-      )}
-    >
-      <div
-        className="h-full w-full flex-1 bg-primary transition-all"
-        style={{
-          transform: `translateX(-${100 - itemContext.fileState.progress}%)`,
-        }}
-      />
-    </ItemProgressPrimitive>
-  );
+    case "fill": {
+      const progressPercentage = itemContext.fileState.progress;
+      const topInset = 100 - progressPercentage;
+
+      return (
+        <ItemProgressPrimitive
+          role="progressbar"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={progressPercentage}
+          aria-valuetext={`${progressPercentage}%`}
+          aria-labelledby={itemContext.nameId}
+          data-slot="file-upload-progress"
+          {...progressProps}
+          ref={forwardedRef}
+          className={cn(
+            "absolute inset-0 bg-primary/50 transition-[clip-path] duration-300 ease-linear",
+            className
+          )}
+          style={{
+            clipPath: `inset(${topInset}% 0% 0% 0%)`,
+          }}
+        />
+      );
+    }
+
+    default:
+      return (
+        <ItemProgressPrimitive
+          role="progressbar"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={itemContext.fileState.progress}
+          aria-valuetext={`${itemContext.fileState.progress}%`}
+          aria-labelledby={itemContext.nameId}
+          data-slot="file-upload-progress"
+          {...progressProps}
+          ref={forwardedRef}
+          className={cn(
+            "relative h-1.5 w-full overflow-hidden rounded-full bg-primary/20",
+            className
+          )}
+        >
+          <div
+            className="h-full w-full flex-1 bg-primary transition-transform duration-300 ease-linear"
+            style={{
+              transform: `translateX(-${
+                100 - itemContext.fileState.progress
+              }%)`,
+            }}
+          />
+        </ItemProgressPrimitive>
+      );
+  }
 });
 FileUploadItemProgress.displayName = ITEM_PROGRESS_NAME;
 
@@ -1261,7 +1360,7 @@ const FileUploadItemDelete = React.forwardRef<
         file: itemContext.fileState.file,
       });
     },
-    [store, itemContext.fileState, propsRef]
+    [propsRef, itemContext.fileState, store]
   );
 
   if (!itemContext.fileState) return null;
@@ -1312,7 +1411,6 @@ const FileUploadClear = React.forwardRef<
   );
 
   const hasFiles = useStore((state) => state.files.size > 0);
-
   const shouldRender = forceMount || hasFiles;
 
   if (!shouldRender) return null;

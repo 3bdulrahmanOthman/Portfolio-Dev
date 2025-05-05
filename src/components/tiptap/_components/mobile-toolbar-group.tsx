@@ -36,7 +36,7 @@ export const MobileToolbarGroup: React.FC<MobileToolbarGroupProps> = ({
           variant="ghost"
           size="sm"
           className={cn(
-            "h-8 w-max gap-1 px-3 text-sm font-medium sm:h-9 sm:text-base",
+            "h-7 cursor-pointer w-max gap-1 px-3 text-sm font-medium sm:h-8 sm:text-base",
             className
           )}
         >
@@ -73,9 +73,8 @@ export const MobileToolbarItem: React.FC<MobileToolbarItemProps> = ({
   return (
     <DrawerClose
       className={cn(
-        buttonVariants({ variant: "ghost", size: "sm" }),
-        "h-8 w-full text-start",
-        active && "bg-accent text-accent-foreground",
+        buttonVariants(active ? { variant:"ghost", size: "sm" } : { variant:"secondary", size: "sm" }),
+        "h-7 sm:h-8 cursor-pointer w-full text-start",
         className
       )}
       onClick={(e) => {

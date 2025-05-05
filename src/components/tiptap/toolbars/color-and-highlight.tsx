@@ -185,7 +185,7 @@ export const ColorHighlightToolbar = ({
                 role="combobox"
                 variant="ghost"
                 size="sm"
-                className="ml-auto h-8"
+                className="ml-auto h-7 sm:h-8 cursor-pointer"
               >
                 <span
                   className="text-md"

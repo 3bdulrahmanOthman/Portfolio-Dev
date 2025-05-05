@@ -3,7 +3,6 @@
 import { BubbleMenu, type Editor } from "@tiptap/react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { EditorProvider } from "../editor-provider";
 
 import { HeadingsToolbar } from "../toolbars/headings";
@@ -47,7 +46,6 @@ export const EditorToolbar = (props: EditorToolbarProps) => {
 
   const toolbarContent = (
     <EditorProvider editor={editor}>
-      <TooltipProvider>
         <ScrollArea>
           <div
             className={cn(
@@ -204,7 +202,6 @@ export const EditorToolbar = (props: EditorToolbarProps) => {
           </div>
           <ScrollBar className="size-full opacity-0" orientation="horizontal" />
         </ScrollArea>
-      </TooltipProvider>
     </EditorProvider>
   );
 
