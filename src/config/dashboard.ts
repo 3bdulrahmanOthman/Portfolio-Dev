@@ -64,6 +64,11 @@ export const dashboardConfig: DashboardConfig = {
             },
           ],
         },
+        {
+          title: "Categories",
+          path: "/admin/categories",
+          icon: "listTree",
+        },
       ],
     },
     {

@@ -20,15 +20,20 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { exportTableToCSV } from "@/lib/export";
 import { deleteProjects, updateProjects } from "@/actions/projects";
-import { Project } from "@/schemas";
+import { Category, Project } from "@/schemas";
+import { Icons } from "@/components/icons";
 
-type Action = "update-featured" | "export" | "delete";
+type Action = "update-featured" | "update-category" | "export" | "delete";
 
 interface ProjectTableActionBarProps {
   table: Table<Project>;
+  categories: Omit<Category, "projects">[];
 }
 
-export function ProjectTableActionBar({ table }: ProjectTableActionBarProps) {
+export function ProjectTableActionBar({
+  table,
+  categories,
+}: ProjectTableActionBarProps) {
   const rows = table.getFilteredSelectedRowModel().rows;
   const [isPending, startTransition] = React.useTransition();
   const [currentAction, setCurrentAction] = React.useState<Action | null>(null);
@@ -38,25 +43,34 @@ export function ProjectTableActionBar({ table }: ProjectTableActionBarProps) {
     [isPending, currentAction]
   );
 
-  const onProjectUpdate = React.useCallback(
-    ({ field, value }: { field: "featured"; value: boolean }) => {
-      if (!rows.length) return toast.error("No rows selected");
-      setCurrentAction("update-featured");
-      startTransition(async () => {
-        const { error } = await updateProjects({
-          ids: rows.map((row) => row.original.id as string),
-          [field]: value,
-        });
+  const onProjectFieldUpdate = <
+    T extends keyof Pick<Project, "featured" | "categories">
+  >(
+    field: T,
+    value: Project[T]
+  ) => {
+    if (!rows.length) return toast.error("No rows selected");
 
-        if (error) {
-          toast.error(error);
-          return;
-        }
-        toast.success(`Projects marked as ${value ? "Featured" : "Standard"}`);
+    const actionType =
+      field === "featured" ? "update-featured" : "update-category";
+    setCurrentAction(actionType);
+
+    startTransition(() => {
+      updateProjects({
+        ids: rows.map((row) => row.original.id as string),
+        [field]: value,
+      }).then(({ error }) => {
+        if (error) return toast.error(error);
+
+        const label =
+          field === "featured"
+            ? `Projects marked as ${value ? "Featured" : "Standard"}`
+            : "Projects category updated";
+
+        toast.success(label);
       });
-    },
-    [rows]
-  );
+    });
+  };
 
   const onProjectExport = React.useCallback(() => {
     if (!rows.length) return toast.error("No rows selected");
@@ -73,17 +87,17 @@ export function ProjectTableActionBar({ table }: ProjectTableActionBarProps) {
   const onProjectDelete = React.useCallback(() => {
     if (!rows.length) return toast.error("No rows selected");
     setCurrentAction("delete");
-    startTransition(async () => {
-      const { error } = await deleteProjects(
+    startTransition(() => {
+      deleteProjects(
         rows.map((row) => row.original.id as string)
-      );
-
-      if (error) {
-        toast.error(error);
-        return;
-      }
-      toast.success("Projects deleted");
-      table.toggleAllRowsSelected(false);
+      ).then(({ error }) => {
+        if (error) {
+          toast.error(error);
+          return;
+        }
+        toast.success("Projects deleted");
+        table.toggleAllRowsSelected(false);
+      });
     });
   }, [rows, table]);
 
@@ -95,12 +109,10 @@ export function ProjectTableActionBar({ table }: ProjectTableActionBarProps) {
         className="hidden data-[orientation=vertical]:h-5 sm:block"
       />
       <div className="flex items-center gap-1.5">
+        {/* Featured Status */}
         <Select
           onValueChange={(val) =>
-            onProjectUpdate({
-              field: "featured",
-              value: val === "true",
-            })
+            onProjectFieldUpdate("featured", val === "true")
           }
         >
           <SelectTrigger asChild>
@@ -120,6 +132,34 @@ export function ProjectTableActionBar({ table }: ProjectTableActionBarProps) {
           </SelectContent>
         </Select>
 
+        {/* Update Categories */}
+        <Select
+          onValueChange={(categoryId) =>
+            onProjectFieldUpdate("categories", categoryId === "__clear__" ? "" : categoryId)
+          }
+        >
+          <SelectTrigger asChild>
+            <DataTableActionBarAction
+              size="icon"
+              tooltip="Update Category"
+              isPending={getIsActionPending("update-category")}
+            >
+              <Icons.listTree />
+            </DataTableActionBarAction>
+          </SelectTrigger>
+          <SelectContent align="center">
+            <SelectGroup>
+              {categories.map((cat) => (
+                <SelectItem key={cat.id ?? ""} value={cat.id ?? ""}>
+                  {cat.name}
+                </SelectItem>
+              ))}
+              {/* <SelectItem value="__clear__">Clear Category</SelectItem> */}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+
+        {/* Export */}
         <DataTableActionBarAction
           size="icon"
           tooltip="Export Projects"
@@ -129,6 +169,7 @@ export function ProjectTableActionBar({ table }: ProjectTableActionBarProps) {
           <Download />
         </DataTableActionBarAction>
 
+        {/* Delete */}
         <DataTableActionBarAction
           size="icon"
           tooltip="Delete Projects"

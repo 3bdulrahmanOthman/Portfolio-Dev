@@ -28,17 +28,18 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Project } from "@/schemas";
-
+import { Category, Project } from "@/schemas";
 
 interface ProjectsTableColumnsProps {
   setRowAction: React.Dispatch<
     React.SetStateAction<DataTableRowAction<Project> | null>
   >;
+  categories: Omit<Category, "projects">[];
 }
 
 export function projectsTableColumns({
   setRowAction,
+  categories,
 }: ProjectsTableColumnsProps): ColumnDef<Project>[] {
   return [
     {
@@ -51,6 +52,7 @@ export function projectsTableColumns({
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
+          className="translate-y-0.5"
         />
       ),
       cell: ({ row }) => (
@@ -58,11 +60,12 @@ export function projectsTableColumns({
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
+          className="translate-y-0.5"
         />
       ),
-      size: 32,
       enableSorting: false,
       enableHiding: false,
+      size: 40,
     },
     {
       id: "title",
@@ -153,6 +156,41 @@ export function projectsTableColumns({
       },
     },
     {
+      id: "categories",
+      accessorKey: "categories",
+      header: ({ column }: { column: Column<Project, unknown> }) => (
+        <DataTableColumnHeader column={column} title="Categories" />
+      ),
+      cell: ({ cell }) => {
+        const categories = cell.getValue<Project["categories"]>();
+        return (
+          <div className="flex flex-wrap gap-1 max-w-[200px]">
+            {categories?.length ? (
+              categories.map((c: Category) => (
+                <Badge key={c.id} variant="secondary" className="capitalize">
+                  {c.name}
+                </Badge>
+              ))
+            ) : (
+              <span className="text-muted-foreground text-sm italic">None</span>
+            )}
+          </div>
+        );
+      },
+      enableColumnFilter: true,
+      meta: {
+        label: "Categories",
+        variant: "multiSelect",
+        options: categories.map((c) => ({
+          label: c.name.charAt(0).toUpperCase() + c.name.slice(1),
+          value: c.name,
+          count: categories.length,
+        })),
+        icon: Icons.listTree,
+      },
+    },
+
+    {
       id: "featured",
       accessorKey: "featured",
       header: ({ column }: { column: Column<Project, unknown> }) => (
@@ -209,7 +247,11 @@ export function projectsTableColumns({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
               <DropdownMenuItem asChild>
-                <Link href={`/admin/projects/${slugify(row.original.title)}/edit`}>Edit</Link>
+                <Link
+                  href={`/admin/projects/${slugify(row.original.title)}/edit`}
+                >
+                  Edit
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem

@@ -1,62 +1,72 @@
 "use client";
 
-import { useForm, SubmitHandler } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
+import { Project, ProjectSchema, Category } from "@/schemas";
 import { upsertProject } from "@/actions/projects";
 import { slugify, cn } from "@/lib/utils";
 
-import { Button } from "@/components/ui/button";
 import {
   Form,
-  FormControl,
-  FormDescription,
   FormField,
   FormItem,
+  FormControl,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
+
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import AppContentLayout from "../admin/content-layout";
-import { ScrollArea } from "../ui/scroll-area";
-import { Shell } from "../shell";
-import { Icons } from "../icons";
-import { StarsBackground } from "../animate-ui/stars-background";
-import { ProjectImageUpload } from "../admin/project-image-upload";
-import { RichTextEditor } from "../tiptap/rich-text-editor";
-import { SidebarTrigger } from "../ui/sidebar";
-import { Project, ProjectSchema } from "@/schemas";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Shell } from "@/components/shell";
+import { Icons } from "@/components/icons";
+import { ProjectImageUpload } from "@/components/admin/project-image-upload";
+import { RichTextEditor } from "@/components/tiptap/rich-text-editor";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import AppContentLayout from "@/components/admin/content-layout";
+import { StarsBackground } from "@/components/animate-ui/stars-background";
+import { SelectOption } from "../select-option";
 
 interface ProjectFormProps {
-  initialData?: Project | null;
+  initialData?: Project;
+  initialCatData: Category[];
 }
 
-export default function ProjectForm({ initialData }: ProjectFormProps) {
+export default function ProjectForm({
+  initialData,
+  initialCatData,
+}: ProjectFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   const isEdit = !!initialData;
+  console.log("Initial Data:", initialData);
+  console.log("Initial Data Categories:", initialData?.categories?.map((cat: Category) => cat.id));
+  console.log("Initial Category Products Count:", initialData?.categories?.map((cat: Category) => cat.projects?.length));
+
   const form = useForm<Project>({
     resolver: zodResolver(ProjectSchema),
-    defaultValues: isEdit
-      ? {
-          ...initialData,
-        }
-      : {
-          title: "",
-          slug: "",
-          description: "",
-          content: "",
-          image: "",
-          demoUrl: null,
-          githubUrl: null,
-          featured: false,
-        },
+    defaultValues: isEdit ? {
+      ...initialData,
+      categories: initialData?.categories?.map((cat: Category) => cat.id),
+    } : {
+      title: "",
+      slug: "",
+      description: "",
+      content: "",
+      image: "",
+      demoUrl: null,
+      githubUrl: null,
+      featured: false,
+      categories: [],
+    },
   });
 
   const generateSlug = () => {
@@ -73,6 +83,7 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
   };
 
   const onSubmit: SubmitHandler<Project> = (data) => {
+    console.log("Submitting data:", data.categories);
     startTransition(async () => {
       const result = await upsertProject(data);
 
@@ -84,7 +95,7 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
       if (result.fieldErrors) {
         for (const [field, errors] of Object.entries(result.fieldErrors)) {
           if (errors?.length) {
-            form.setError(field as keyof Project, {
+            form.setError(field, {
               type: "manual",
               message: errors[0],
             });
@@ -99,16 +110,12 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
     });
   };
 
-  // const onError = (errors: FieldErrors<Project>) => {
-  //   console.error("❌ Form Errors:", errors);
-  // };
-
   return (
     <AppContentLayout
       header={
         <>
           <SidebarTrigger className="mr-4" />
-          <h1 className="font-bold">
+          <h1 className="font-bold text-lg">
             {isEdit ? "Edit Project" : "Create New Project"}
           </h1>
         </>
@@ -117,10 +124,10 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
       <Shell variant="sidebar">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <ScrollArea className="h-[calc(100svh-140px)] md:h-[calc(100svh-160px)]">
-              <div className="space-y-6 px-6">
+            <ScrollArea className="h-[calc(100svh-140px)] md:h-[calc(100svh-160px)] px-6">
+              <div className="space-y-6">
                 {/* Title & Slug */}
-                <div className="grid grid-cols-1 md:grid-cols-2 items-start gap-6">
+                <div className="grid md:grid-cols-2 gap-6 items-start">
                   <FormField
                     control={form.control}
                     name="title"
@@ -130,17 +137,18 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
                         <FormControl>
                           <Input
                             {...field}
-                            placeholder="Project title"
                             onChange={(e) => {
                               field.onChange(e);
                               if (!initialData?.slug) generateSlug();
                             }}
+                            placeholder="My Awesome Project"
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+
                   <FormField
                     control={form.control}
                     name="slug"
@@ -149,7 +157,7 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
                         <FormLabel>Slug</FormLabel>
                         <div className="flex gap-2">
                           <FormControl>
-                            <Input {...field} placeholder="project-slug" />
+                            <Input {...field} placeholder="awesome-project" />
                           </FormControl>
                           <Button
                             type="button"
@@ -160,7 +168,7 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
                           </Button>
                         </div>
                         <FormDescription>
-                          Used in URL: /projects/[slug]
+                          Used in /projects/[slug]
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -178,8 +186,8 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
                       <FormControl>
                         <Textarea
                           {...field}
-                          className="min-h-24"
                           placeholder="Short project description"
+                          className="min-h-24"
                         />
                       </FormControl>
                       <FormMessage />
@@ -188,7 +196,7 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
                 />
 
                 {/* Links */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid md:grid-cols-2 gap-6">
                   <FormField
                     control={form.control}
                     name="demoUrl"
@@ -202,13 +210,9 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
                               field.onChange(e.target.value || null)
                             }
                             value={field.value || ""}
-                            placeholder="https://example.com"
-                            disabled={isPending}
+                            placeholder="https://demo.example.com"
                           />
                         </FormControl>
-                        <FormDescription>
-                          Optional live demo link
-                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -226,30 +230,53 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
                               field.onChange(e.target.value || null)
                             }
                             value={field.value || ""}
-                            placeholder="https://github.com/user/repo"
-                            disabled={isPending}
+                            placeholder="https://github.com/user/project"
                           />
                         </FormControl>
-                        <FormDescription>Optional GitHub repo</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
 
+                <FormField
+                  control={form.control}
+                  name="categories"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Categories</FormLabel>
+                      <FormControl>
+                        <SelectOption
+                          className="w-full justify-start"
+                          title="Categories"
+                          options={initialCatData.map((cat) => ({
+                            label: cat.name,
+                            value: cat.id ?? "",
+                            count: cat.projects?.length ?? 0,
+                          }))}
+                          value={new Set(field.value)}
+                          onChange={(id) => field.onChange(id)}
+                          multiple
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 {/* Featured & Image */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid md:grid-cols-2 gap-6">
                   <FormField
                     control={form.control}
                     name="featured"
                     render={({ field }) => (
-                      <FormItem className="flex flex-col h-full">
+                      <FormItem className="h-full flex flex-col">
                         <FormLabel>Featured</FormLabel>
                         <FormControl className="h-full">
                           <StarsBackground
                             onClick={() => field.onChange(!field.value)}
                             className={cn(
-                              "relative rounded-lg border-2 p-6 border-dashed transition-colors h-full cursor-pointer",
+                              "relative border-2 p-6 rounded-lg border-dashed h-full cursor-pointer transition-colors",
                               field.value
                                 ? "border-ring/70 bg-[radial-gradient(ellipse_at_bottom,_#262626_0%,_#000_100%)]"
                                 : "bg-none"
@@ -258,19 +285,22 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
                             {field.value && (
                               <Icons.checkCircled className="absolute -bottom-20 -right-10 size-64 rotate-[24deg] opacity-5" />
                             )}
-                            <FormDescription>Show on homepage</FormDescription>
+                            <FormDescription>
+                              Mark as homepage featured
+                            </FormDescription>
                           </StarsBackground>
                         </FormControl>
                       </FormItem>
                     )}
                   />
+
                   <FormField
                     control={form.control}
                     name="image"
                     render={({ field }) => (
-                      <FormItem className="flex flex-col h-full">
+                      <FormItem className="h-full flex flex-col">
                         <FormLabel>Project Image</FormLabel>
-                        <FormControl className="h-full">
+                        <FormControl>
                           <ProjectImageUpload
                             value={field.value ?? ""}
                             onChange={handleImageUpload}
@@ -310,8 +340,9 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
                 />
               </div>
             </ScrollArea>
-            {/* Actions */}
-            <div className="flex justify-between gap-6 mt-6 px-6">
+
+            {/* Submit */}
+            <div className="flex justify-between items-center px-6 mt-6">
               <Button
                 type="button"
                 variant="outline"
@@ -323,8 +354,8 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
               <Button type="submit" disabled={isPending}>
                 {isPending ? (
                   <>
-                    <Icons.spinner className="animate-spin" />
-                    <span>Saving...</span>
+                    <Icons.spinner className="animate-spin mr-2" />
+                    Saving...
                   </>
                 ) : isEdit ? (
                   "Update Project"

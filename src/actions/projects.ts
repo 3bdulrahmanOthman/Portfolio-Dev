@@ -4,7 +4,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/db/prisma";
 import { revalidatePath } from "next/cache";
 import { createSafeAction, type ActionState } from "@/lib/utils";
-import { GetProjectSchema, Project, ProjectSchema } from "@/schemas";
+import { Category, GetProjectSchema, Project, ProjectSchema } from "@/schemas";
 import { auth } from "@/auth";
 import { unstable_cache } from "next/cache";
 
@@ -34,6 +34,17 @@ export async function getProjects(input: GetProjectSchema) {
               lte: new Date(input.createdAt[1]),
             },
           }),
+
+          ...(input.categories.length > 0 && {
+            categories: {
+              some: {
+                name: {
+                  in: input.categories,
+                  mode: "insensitive",
+                },
+              },
+            },
+          }),
         };
 
         const orderBy: Prisma.ProjectOrderByWithRelationInput[] =
@@ -49,6 +60,7 @@ export async function getProjects(input: GetProjectSchema) {
             skip: offset,
             take: input.perPage,
             orderBy,
+            include: { categories: true },
           }),
           prisma.project.count({ where }),
         ]);
@@ -64,7 +76,7 @@ export async function getProjects(input: GetProjectSchema) {
     {
       revalidate: 1,
       tags: ["projects"],
-    },
+    }
   )();
 }
 
@@ -72,6 +84,7 @@ export async function getProjectBySlug(slug: string) {
   try {
     const project = await prisma.project.findUnique({
       where: { slug },
+      include: { categories: true },
     });
     return project;
   } catch (error) {
@@ -84,6 +97,7 @@ export async function getProjectById(id: string) {
   try {
     const project = await prisma.project.findUnique({
       where: { id },
+      include: { categories: true },
     });
     return project;
   } catch (error) {
@@ -96,72 +110,69 @@ async function handler(data: Project): Promise<ProjectOutput> {
   const session = await auth();
 
   if (!session || session.user?.role !== "admin") {
-    return {
-      error: "Unauthorized",
-    };
+    return { error: "Unauthorized" };
   }
 
   try {
-    const { id, ...values } = data;
+    const { id, categories = [], ...values } = data;
 
-    if (!id) {
-      const existingProject = await prisma.project.findUnique({
-        where: { slug: values.slug },
-      });
-
-      if (existingProject) {
-        return {
-          fieldErrors: {
-            slug: ["Slug is already in use"],
-          },
-        };
-      }
-    } else {
-      const existingProject = await prisma.project.findUnique({
-        where: { slug: values.slug },
-      });
-
-      if (existingProject && existingProject.id !== id) {
-        return {
-          fieldErrors: {
-            slug: ["Slug is already in use"],
-          },
-        };
-      }
+    // Validate slug uniqueness
+    const existing = await prisma.project.findUnique({
+      where: { slug: values.slug },
+      include: { categories: true },
+    });
+    if (existing && existing.id !== id) {
+      return {
+        fieldErrors: {
+          slug: ["Slug is already in use"],
+        },
+      };
     }
+
+    // 🟢 Now categoryConnect is built from string[]
+    const categoryConnect = categories.map((id: Category["id"]) => ({ id }));
+
+    const baseData: Prisma.ProjectUncheckedCreateInput = {
+      ...values,
+      categories: {
+        connect: categoryConnect,
+      },
+    };
 
     if (id) {
       await prisma.project.update({
         where: { id },
-        data: values,
+        data: baseData,
       });
     } else {
       await prisma.project.create({
-        data: values,
+        data: baseData,
       });
     }
 
     revalidatePath("/projects");
     revalidatePath("/admin/projects");
 
-    return {
-      data: { success: true },
-    };
+    return { data: { success: true } };
   } catch (error) {
-    console.error("Failed to save project:", error);
-    return {
-      error: "Failed to save project",
-    };
+    console.error("❌ Failed to save project:", error);
+    return { error: "Failed to save project" };
   }
 }
 
-
 export async function updateProjects(data: {
   ids: string[];
-  featured: boolean;
+  featured?: boolean;
+  categories?: string; // categoryId
 }) {
+  const session = await auth();
+
+  if (!session || session.user?.role !== "admin") {
+    return { error: "Unauthorized", data: null };
+  }
+
   try {
-    const { ids, featured } = data;
+    const { ids, featured, categories } = data;
 
     if (!ids.length) {
       return {
@@ -170,16 +181,34 @@ export async function updateProjects(data: {
       };
     }
 
-    await prisma.project.updateMany({
-      where: {
-        id: {
-          in: ids,
+    // ⚠️ Prisma does NOT support relation updates in updateMany.
+    // So we need to loop through each project if category is being updated
+    if (typeof categories === "string") {
+      await Promise.all(
+        ids.map((id) =>
+          prisma.project.update({
+            where: { id },
+            data: {
+              categories: {
+                set: categories ? [{ id: categories }] : [],
+              },
+            },
+          })
+        )
+      );
+    }
+
+    // ⚡ If featured is present, use updateMany
+    if (typeof featured === "boolean") {
+      await prisma.project.updateMany({
+        where: {
+          id: { in: ids },
         },
-      },
-      data: {
-        featured,
-      },
-    });
+        data: {
+          featured,
+        },
+      });
+    }
 
     revalidatePath("/projects");
     revalidatePath("/admin/projects");
@@ -188,9 +217,9 @@ export async function updateProjects(data: {
       data: { success: true },
     };
   } catch (error) {
-    console.error("Failed to save project:", error);
+    console.error("Failed to update projects:", error);
     return {
-      error: "Failed to save project",
+      error: "Failed to update projects",
     };
   }
 }

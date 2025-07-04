@@ -7,7 +7,6 @@ import {
 } from "nuqs/server";
 import { getFiltersStateParser, getSortingStateParser } from "@/lib/parsers";
 
-
 export const LoginSchema = z.object({
   email: z.string().email({
     message: "Please enter a valid email address. Email is required.",
@@ -80,7 +79,7 @@ export const AboutSchema = z.object({
   content: z.string().min(1, "Content is required"),
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
-})
+});
 
 export type About = z.infer<typeof AboutSchema>;
 
@@ -94,38 +93,70 @@ export const ContactSchema = z.object({
   content: z.string().min(1, "Content is required"),
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
-})
+});
 
 export type Contact = z.infer<typeof ContactSchema>;
 
-export const ProjectSchema = z.object({
-  id: z.string().optional(),
-  title: z.string().min(1, "Title is required"),
-  slug: z.string().min(1, "Slug is required"),
-  description: z.string().min(1, "Description is required"),
-  content: z.string().min(1, "Content is required"),
-  image: z.string().nullable(),
-  demoUrl: z.string().url().nullable().optional(),
-  githubUrl: z.string().url().nullable().optional(),
-  featured: z.boolean(),
-  createdAt: z.date().optional(),
-  updatedAt: z.date().optional(),
-});
+export const ProjectSchema: z.ZodType = z.lazy(() =>
+  z.object({
+    id: z.string().optional(),
+    title: z.string().min(1, "Title is required"),
+    slug: z.string().min(1, "Slug is required"),
+    description: z.string().min(1, "Description is required"),
+    content: z.string().min(1, "Content is required"),
+    image: z.string().nullable().optional(),
+    demoUrl: z.string().url().nullable().optional(),
+    githubUrl: z.string().url().nullable().optional(),
+    featured: z.boolean(),
+    createdAt: z.date().optional(),
+    updatedAt: z.date().optional(),
+    categories: z.array(z.string()).min(1, "At least one category is required"),
+  })
+);
 
 export type Project = z.infer<typeof ProjectSchema>;
 
-export const searchParamsCache = createSearchParamsCache({
+export const CategorySchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(1, "Name is required"),
+  slug: z.string().min(1, "Slug is required"),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+  projects: z.array(z.string()).optional(), // projects: z.array(ProjectSchema).optional(), 
+});
+
+export type Category = z.infer<typeof CategorySchema>;
+
+const baseSearchParams = {
   page: parseAsInteger.withDefault(1),
   perPage: parseAsInteger.withDefault(10),
+  createdAt: parseAsArrayOf(z.coerce.number()).withDefault([]),
+  filters: getFiltersStateParser().withDefault([]),
+};
+
+export const projectSearchParamsCache = createSearchParamsCache({
+  ...baseSearchParams,
   sort: getSortingStateParser<Project>().withDefault([
     { id: "createdAt", desc: true },
   ]),
   title: parseAsString.withDefault(""),
   featured: parseAsArrayOf(z.enum(["featured", "standard"])).withDefault([]),
-  createdAt: parseAsArrayOf(z.coerce.number()).withDefault([]),
-  filters: getFiltersStateParser().withDefault([]),
+  categories: parseAsArrayOf(z.string()).withDefault([]),
 });
 
 export type GetProjectSchema = Awaited<
-  ReturnType<typeof searchParamsCache.parse>
+  ReturnType<typeof projectSearchParamsCache.parse>
+>;
+
+export const categorySearchParamsCache = createSearchParamsCache({
+  ...baseSearchParams,
+  sort: getSortingStateParser<Category>().withDefault([
+    { id: "createdAt", desc: true },
+  ]),
+  name: parseAsString.withDefault(""),
+  projects: parseAsArrayOf(z.string()).withDefault([]),
+});
+
+export type GetCategorySchema = Awaited<
+  ReturnType<typeof categorySearchParamsCache.parse>
 >;

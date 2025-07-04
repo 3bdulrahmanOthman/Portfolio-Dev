@@ -17,30 +17,40 @@ import { Icons } from "@/components/icons";
 import { useRouter } from "next/navigation";
 import { Project } from "@/schemas";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { getCategories } from "@/actions/categories";
 
 interface ProjectTableProps {
-  initialData: Awaited<ReturnType<typeof getProjects>>;
+  promises: Promise<
+    [
+      Awaited<ReturnType<typeof getProjects>>,
+      Awaited<ReturnType<typeof getCategories>>,
+    ]
+  >;
 }
 
-export function ProjectsTable({ initialData }: ProjectTableProps) {
+export function ProjectsTable({ promises }: ProjectTableProps) {
+  const [
+    { data: projects, pageCount: projectCounts },
+    { data: categories },
+  ] = React.use(promises);
+
   const router = useRouter();
   const [rowAction, setRowAction] =
     React.useState<DataTableRowAction<Project> | null>(null);
-
-  const { data, pageCount } = initialData;
 
   const columns = React.useMemo(
     () =>
       projectsTableColumns({
         setRowAction,
+        categories,
       }),
-    [setRowAction]
+    [setRowAction, categories]
   );
 
   const { table } = useDataTable({
-    data,
+    data: projects,
     columns,
-    pageCount,
+    pageCount: projectCounts,
     initialState: {
       sorting: [{ id: "createdAt", desc: true }],
       columnPinning: { right: ["actions"] },
@@ -70,7 +80,7 @@ export function ProjectsTable({ initialData }: ProjectTableProps) {
     >
       <DataTable
         table={table}
-        actionBar={<ProjectTableActionBar table={table} />}
+        actionBar={<ProjectTableActionBar table={table} categories={categories} />}
       >
         <DataTableToolbar table={table} className="items-center py-1 px-6" />
       </DataTable>
@@ -79,9 +89,10 @@ export function ProjectsTable({ initialData }: ProjectTableProps) {
         open={rowAction?.variant === "delete"}
         onOpenChange={() => setRowAction(null)}
         //Updated to support single and multiple row selection
-        rows={table
-          .getFilteredSelectedRowModel()
-          .rows.map((row) => row.original)} //{rowAction?.row.original ? [rowAction.row.original] : []}
+        rows={rowAction?.row.original ? [rowAction.row.original] : []}
+        //{table
+        //  .getFilteredSelectedRowModel()
+        //  .rows.map((row) => row.original)} //{rowAction?.row.original ? [rowAction.row.original] : []}
         showTrigger={false}
         onSuccess={() => rowAction?.row.toggleSelected(false)}
         onConfirm={async ({ ids }) => await deleteProjects(ids)}
