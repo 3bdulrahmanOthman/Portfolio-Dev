@@ -29,12 +29,17 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Category, Project } from "@/schemas";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 interface ProjectsTableColumnsProps {
   setRowAction: React.Dispatch<
     React.SetStateAction<DataTableRowAction<Project> | null>
   >;
-  categories: Omit<Category, "projects">[];
+  categories: Category[];
 }
 
 export function projectsTableColumns({
@@ -164,13 +169,35 @@ export function projectsTableColumns({
       cell: ({ cell }) => {
         const categories = cell.getValue<Project["categories"]>();
         return (
-          <div className="flex flex-wrap gap-1 max-w-[200px]">
+          <div className="flex gap-1">
             {categories?.length ? (
-              categories.map((c: Category) => (
-                <Badge key={c.id} variant="secondary" className="capitalize">
-                  {c.name}
+              <>
+                <Badge
+                  key={categories[0].id}
+                  variant="secondary"
+                  className="capitalize"
+                >
+                  {categories[0].name}
                 </Badge>
-              ))
+                {categories.length > 1 && (
+                  <HoverCard>
+                    <HoverCardTrigger>
+                      <Badge variant="outline">+{categories.length - 1}</Badge>
+                    </HoverCardTrigger>
+                    <HoverCardContent className="flex gap-2 p-2">
+                      {categories.map((c: Category, index: number) => (
+                        <Badge
+                          key={c.id}
+                          variant={index === 0 ? "secondary" : "outline"}
+                          className="capitalize"
+                        >
+                          {c.name}
+                        </Badge>
+                      ))}
+                    </HoverCardContent>
+                  </HoverCard>
+                )}
+              </>
             ) : (
               <span className="text-muted-foreground text-sm italic">None</span>
             )}
@@ -184,7 +211,7 @@ export function projectsTableColumns({
         options: categories.map((c) => ({
           label: c.name.charAt(0).toUpperCase() + c.name.slice(1),
           value: c.name,
-          count: categories.length,
+          count: c.projects?.length,
         })),
         icon: Icons.listTree,
       },
