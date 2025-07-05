@@ -112,7 +112,7 @@ export default function SignInForm() {
 
             <Button
               type="submit"
-              className="w-full"
+              className="w-full pointer"
               disabled={form.formState.isSubmitting || isPending}
             >
               {form.formState.isSubmitting || isPending ? (

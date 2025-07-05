@@ -122,7 +122,7 @@ export const CategorySchema = z.object({
   slug: z.string().min(1, "Slug is required"),
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
-  projects: z.array(z.string()).optional(), // projects: z.array(ProjectSchema).optional(), 
+  projects: z.array(z.object({ id: z.string() })).optional()
 });
 
 export type Category = z.infer<typeof CategorySchema>;

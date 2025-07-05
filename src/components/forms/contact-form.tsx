@@ -194,7 +194,7 @@ export function ContactForm({ initialData }: ContactFormProps) {
         </ScrollArea>
         {/* Actions */}
         <div className="flex justify-end gap-4 mt-6 px-6">
-          <Button type="submit" disabled={isPending}>
+          <Button type="submit" className="cursor-pointer" disabled={isPending}>
             {isPending ? (
               <>
                 <Icons.spinner className="animate-spin size-4" />

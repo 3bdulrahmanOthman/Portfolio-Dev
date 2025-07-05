@@ -129,24 +129,26 @@ async function handler(data: Project): Promise<ProjectOutput> {
       };
     }
 
-    // 🟢 Now categoryConnect is built from string[]
     const categoryConnect = categories.map((id: Category["id"]) => ({ id }));
-
-    const baseData: Prisma.ProjectUncheckedCreateInput = {
-      ...values,
-      categories: {
-        connect: categoryConnect,
-      },
-    };
 
     if (id) {
       await prisma.project.update({
         where: { id },
-        data: baseData,
+        data: {
+          ...values,
+          categories: {
+            set: categoryConnect,
+          },
+        },
       });
     } else {
       await prisma.project.create({
-        data: baseData,
+        data: {
+          ...values,
+          categories: {
+            connect: categoryConnect,
+          },
+        },
       });
     }
 

@@ -4,7 +4,7 @@ import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { prisma } from "../lib/db/prisma";
 import { createSafeAction, type ActionState } from "@/lib/utils";
-import { Category, CategorySchema, GetCategorySchema, Project } from "@/schemas";
+import { Category, CategorySchema, GetCategorySchema } from "@/schemas";
 import { auth } from "@/auth";
 import { unstable_cache } from "next/cache";
 
@@ -86,6 +86,19 @@ export async function getCategoryById(id: string) {
   }
 }
 
+export async function getCategoryBySlug(slug: string) {
+  try {
+    const category = await prisma.category.findUnique({
+      where: { slug },
+      include: { projects: true },
+    });
+    return category;
+  } catch (error) {
+    console.error(`Failed to fetch category with slug ${slug}:`, error);
+    throw new Error("Failed to fetch category");
+  }
+} 
+
 /**
  * 🧠 Handler to create or update category
  */
@@ -93,20 +106,15 @@ async function handler(data: Category): Promise<CategoryOutput> {
   const session = await auth();
 
   if (!session || session.user?.role !== "admin") {
-    return {
-      error: "Unauthorized",
-    };
+    return { error: "Unauthorized" };
   }
 
   try {
-    const { id, projects, ...values } = data;
+    const { id, projects = [], ...values } = data;
 
-    // ⚠️ Check for slug conflicts
     const existing = await prisma.category.findUnique({
       where: { slug: values.slug },
-      include: {
-        projects: true,
-      },
+      include: { projects: true },
     });
 
     if (existing && existing.id !== id) {
@@ -117,43 +125,38 @@ async function handler(data: Category): Promise<CategoryOutput> {
       };
     }
 
-    // ✅ Transform relational projects field if present
-    const projectConnect =
-      projects && projects.length > 0
-        ? {
-            connect: projects.map((p: Project) => ({ id: p.id })),
-          }
-        : undefined;
-
-    const categoryData = {
-      ...values,
-      ...(projectConnect ? { projects: projectConnect } : {}),
-    };
-
     if (id) {
       await prisma.category.update({
         where: { id },
-        data: categoryData,
+        data: {
+          ...values,
+          projects: {
+            set: projects.map((p) => ({ id: p.id })),
+          },
+        },
       });
     } else {
       await prisma.category.create({
-        data: categoryData,
+        data: {
+          ...values,
+          projects: {
+            connect: projects.map((p) => ({ id: p.id })),
+          },
+        },
       });
     }
 
     revalidatePath("/admin/categories");
     revalidatePath("/projects");
 
-    return {
-      data: { success: true },
-    };
+    return { data: { success: true } };
   } catch (error) {
-    console.error("Failed to save category:", error);
-    return {
-      error: "Failed to save category",
-    };
+    console.error("❌ Category upsert failed:", error);
+    return { error: "Failed to save category" };
   }
 }
+
+
 
 /**
  * 💥 Delete single category

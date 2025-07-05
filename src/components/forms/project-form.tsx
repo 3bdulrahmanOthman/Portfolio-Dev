@@ -47,9 +47,6 @@ export default function ProjectForm({
   const [isPending, startTransition] = useTransition();
 
   const isEdit = !!initialData;
-  console.log("Initial Data:", initialData);
-  console.log("Initial Data Categories:", initialData?.categories?.map((cat: Category) => cat.id));
-  console.log("Initial Category Products Count:", initialData?.categories?.map((cat: Category) => cat.projects?.length));
 
   const form = useForm<Project>({
     resolver: zodResolver(ProjectSchema),

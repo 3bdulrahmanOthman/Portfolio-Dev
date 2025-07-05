@@ -172,7 +172,7 @@ export default function SettingsForm() {
           <Button
             type="submit"
             disabled={isPending}
-            className="w-full mt-auto"
+            className="w-full mt-auto cursor-pointer"
             size={"sm"}
           >
             {isPending ? (

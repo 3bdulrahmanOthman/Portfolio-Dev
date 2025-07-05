@@ -68,6 +68,18 @@ export const dashboardConfig: DashboardConfig = {
           title: "Categories",
           path: "/admin/categories",
           icon: "listTree",
+          items: [
+            {
+              title: "All",
+              path: "/admin/categories",
+              icon: "boxes",
+            },
+            {
+              title: "Add",
+              path: "/admin/categories/new",
+              icon: "boxPlus",
+            },
+          ],
         },
       ],
     },
