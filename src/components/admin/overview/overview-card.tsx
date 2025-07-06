@@ -14,7 +14,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import React from "react";
-import { Icons } from "../icons";
+import { Icons } from "../../icons";
 import { cn, RenderIcon } from "@/lib/utils";
 
 interface ChartDataPoint {

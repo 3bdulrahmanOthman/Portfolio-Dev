@@ -1,14 +1,17 @@
+import { getRecentActivity } from "@/actions/activity";
 import { getCategoryCount } from "@/actions/categories";
 import { getProjectCounts } from "@/actions/projects";
 import AppContentLayout from "@/components/admin/content-layout";
-import { OverviewCard } from "@/components/admin/overview-card";
+import ActivityCard from "@/components/admin/overview/activity-card";
+import { OverviewCard } from "@/components/admin/overview/overview-card";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import React from "react";
 
 async function Admin() {
-  const [projectStats, categoryStats] = await Promise.all([
+  const [projectStats, categoryStats, activity] = await Promise.all([
     getProjectCounts(),
     getCategoryCount(),
+    getRecentActivity(),
   ]);
 
   const chartData = projectStats.map((project) => {
@@ -35,6 +38,8 @@ async function Admin() {
       color: "var(--chart-3)",
     },
   };
+
+
   return (
     <AppContentLayout
       header={
@@ -62,6 +67,10 @@ async function Admin() {
           />
         ))}
       </section>
+
+      <aside className="p-2">
+        <ActivityCard activity={activity} />
+      </aside>
     </AppContentLayout>
   );
 }
