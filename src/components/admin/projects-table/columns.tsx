@@ -35,6 +35,23 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 
+export enum CategoriesKeys {
+  WEB_DEVELOPMENT = "web-development",
+  DASHBOARD = "dashboard",
+  LANDING_PAGE = "landing-page",
+  CMS_TEMPLATE = "cms-template",
+  ECOMMERCE = "ecommerce",
+}
+
+export const categoryStyles: Record<CategoriesKeys, string> = {
+  [CategoriesKeys.WEB_DEVELOPMENT]: "bg-indigo-100/30 text-indigo-900 dark:text-indigo-200 border-indigo-200",
+  [CategoriesKeys.DASHBOARD]: "bg-purple-100/30 text-purple-900 dark:text-purple-200 border-purple-200",
+  [CategoriesKeys.LANDING_PAGE]: "bg-pink-100/30 text-pink-900 dark:text-pink-200 border-pink-200",
+  [CategoriesKeys.CMS_TEMPLATE]: "bg-orange-100/30 text-orange-900 dark:text-orange-200 border-orange-200",
+  [CategoriesKeys.ECOMMERCE]: "bg-lime-100/30 text-lime-900 dark:text-lime-200 border-lime-200",
+};
+
+
 interface ProjectsTableColumnsProps {
   setRowAction: React.Dispatch<
     React.SetStateAction<DataTableRowAction<Project> | null>
@@ -175,7 +192,7 @@ export function projectsTableColumns({
                 <Badge
                   key={categories[0].id}
                   variant="secondary"
-                  className="capitalize"
+                  className={cn("capitalize", categoryStyles[categories[0].slug as CategoriesKeys])}
                 >
                   {categories[0].name}
                 </Badge>
@@ -184,12 +201,12 @@ export function projectsTableColumns({
                     <HoverCardTrigger>
                       <Badge variant="outline">+{categories.length - 1}</Badge>
                     </HoverCardTrigger>
-                    <HoverCardContent className="flex gap-2 p-2">
+                    <HoverCardContent className="flex flex-wrap gap-2 p-2">
                       {categories.map((c: Category, index: number) => (
                         <Badge
                           key={c.id}
                           variant={index === 0 ? "secondary" : "outline"}
-                          className="capitalize"
+                          className={cn("capitalize", categoryStyles[c.slug as CategoriesKeys])}
                         >
                           {c.name}
                         </Badge>
@@ -295,3 +312,5 @@ export function projectsTableColumns({
     },
   ];
 }
+
+
