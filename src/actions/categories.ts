@@ -7,6 +7,7 @@ import { createSafeAction, type ActionState } from "@/lib/utils";
 import { Category, CategorySchema, GetCategorySchema } from "@/schemas";
 import { auth } from "@/auth";
 import { unstable_cache } from "next/cache";
+import { format, subMonths } from "date-fns";
 
 type CategoryOutput = ActionState<Category, { success: boolean }>;
 
@@ -70,6 +71,47 @@ export async function getCategories(input: GetCategorySchema) {
   )();
 }
 
+export async function getCategoryCount() {
+  return unstable_cache(
+    async () => {
+      const startDate = subMonths(new Date(), 5);
+      const categories = await prisma.category.findMany({
+        where: {
+          createdAt: {
+            gte: startDate,
+          },
+        },
+        select: {
+          createdAt: true,
+        },
+      });
+
+      const monthlyMap: Record<string, number> = {};
+
+      for (let i = 0; i < 6; i++) {
+        const date = subMonths(new Date(), i);
+        const month = format(date, "MMMM");
+        monthlyMap[month] = 0;
+      }
+
+      categories.forEach((category) => {
+        const month = format(category.createdAt, "MMMM");
+        if (monthlyMap[month] !== undefined) {
+          monthlyMap[month]++;
+        }
+      });
+
+      return Object.entries(monthlyMap)
+        .reverse()
+        .map(([month, count]) => ({
+          month,
+          total_categories: count,
+        }));
+    },
+    ["category-stats"],
+    { revalidate: 3600 }
+  )();
+}
 /**
  * 🔍 Get a category by ID
  */

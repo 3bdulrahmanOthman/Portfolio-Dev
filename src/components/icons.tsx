@@ -38,6 +38,7 @@ import {
   AlignRight,
   Maximize,
   ListTree,
+  Sparkles,
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -80,6 +81,7 @@ export const Icons = {
   alignLeft: AlignLeft,
   maximize: Maximize,
   listTree: ListTree,
+  sparkles: Sparkles,
   logo: ({ ...props }: LucideProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
