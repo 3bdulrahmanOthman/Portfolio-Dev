@@ -7,7 +7,7 @@ import { createSafeAction, type ActionState } from "@/lib/utils";
 import { Category, GetProjectSchema, Project, ProjectSchema } from "@/schemas";
 import { auth } from "@/auth";
 import { unstable_cache } from "next/cache";
-import { format, subMonths } from "date-fns";
+import { subMonths } from "date-fns";
 
 type ProjectOutput = ActionState<Project, { success: boolean }>;
 
@@ -81,54 +81,43 @@ export async function getProjects(input: GetProjectSchema) {
   )();
 }
 
-export async function getProjectCounts() {
-  return unstable_cache(
+export async function getFeaturedProjects() {
+  return await unstable_cache(
     async () => {
-      const startDate = subMonths(new Date(), 5); // last 6 months
-      const projects = await prisma.project.findMany({
-        where: {
-          createdAt: {
-            gte: startDate,
-          },
-        },
+      return await prisma.project.findMany({
+        where: { featured: true },
+        orderBy: { createdAt: "desc" },
         select: {
+          id: true,
+          title: true,
+          slug: true,
           createdAt: true,
           featured: true,
         },
       });
-
-      const monthlyMap: Record<
-        string,
-        { total: number; featured: number }
-      > = {};
-
-      for (let i = 0; i < 6; i++) {
-        const date = subMonths(new Date(), i);
-        const month = format(date, "MMMM");
-        monthlyMap[month] = { total: 0, featured: 0 };
-      }
-
-      projects.forEach((project) => {
-        const month = format(project.createdAt, "MMMM");
-        if (monthlyMap[month]) {
-          monthlyMap[month].total += 1;
-          if (project.featured) monthlyMap[month].featured += 1;
-        }
-      });
-
-      const result = Object.entries(monthlyMap)
-        .reverse()
-        .map(([month, data]) => ({
-          month,
-          total_projects: data.total,
-          featured_projects: data.featured,
-        }));
-
-      return result;
     },
-    ["project-stats"],
-    { revalidate: 3600 }
+    ["featured-projects"],
+    { revalidate: 60 } 
   )();
+}
+
+
+export async function getProjectStats() {
+  const startDate = subMonths(new Date(), 5);
+
+  const projects = await prisma.project.findMany({
+    where: {
+      createdAt: {
+        gte: startDate,
+      },
+    },
+    select: {
+      createdAt: true,
+      featured: true,
+    },
+  });
+
+  return projects;
 }
 
 export async function getProjectBySlug(slug: string) {

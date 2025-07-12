@@ -1,45 +1,24 @@
 import { getRecentActivity } from "@/actions/activity";
-import { getCategoryCount } from "@/actions/categories";
-import { getProjectCounts } from "@/actions/projects";
+import { getCategoryStats, getTopCategoriesStats } from "@/actions/categories";
+import { getFeaturedProjects, getProjectStats } from "@/actions/projects";
 import AppContentLayout from "@/components/admin/content-layout";
 import ActivityCard from "@/components/admin/overview/activity-card";
-import { OverviewCard } from "@/components/admin/overview/overview-card";
+import { FeaturedProjectsTable } from "@/components/admin/overview/featured-projects-table";
+import { StatsCard } from "@/components/admin/overview/stats-card";
+import { TopCategoriesChart } from "@/components/admin/overview/top-category-chart";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import React from "react";
 
 async function Admin() {
-  const [projectStats, categoryStats, activity] = await Promise.all([
-    getProjectCounts(),
-    getCategoryCount(),
-    getRecentActivity(),
-  ]);
-
-  const chartData = projectStats.map((project) => {
-    const category = categoryStats.find((c) => c.month === project.month);
-    return {
-      month: project.month,
-      total_projects: project.total_projects,
-      total_categories: category?.total_categories || 0,
-      featured_projects: project.featured_projects,
-    };
-  });
-
-  const chartConfig = {
-    total_projects: {
-      label: "Total Projects",
-      color: "var(--chart-1)",
-    },
-    total_categories: {
-      label: "Total Categories",
-      color: "var(--chart-2)",
-    },
-    featured_projects: {
-      label: "Featured Projects",
-      color: "var(--chart-3)",
-    },
-  };
-
-
+  const [projects, categories, activity, topCategories, featuredProjects] =
+    await Promise.all([
+      getProjectStats(),
+      getCategoryStats(),
+      getRecentActivity(),
+      getTopCategoriesStats(),
+      getFeaturedProjects(),
+    ]);
   return (
     <AppContentLayout
       header={
@@ -49,28 +28,42 @@ async function Admin() {
         </>
       }
     >
-      <section className="grid grid-cols-[repeat(auto-fit,_minmax(200px,_1fr))] gap-1 border-b">
-        {Object.entries(chartConfig).map(([key, config], index, arr) => (
-          <OverviewCard
-            key={key}
-            icon={
-              config.label === "Total Projects"
-                ? "box"
-                : config.label === "Total Categories"
-                ? "listTree"
-                : "sparkles"
-            }
-            label={config.label}
-            chartData={chartData}
-            chartConfig={chartConfig}
-            className={index < arr.length - 1 ? "rounded-none border-r" : ""}
+      <ScrollArea className="h-[calc(100svh-80px)] md:h-[calc(100svh-40px)]">
+        <section className="grid grid-cols-[repeat(auto-fit,_minmax(200px,_1fr))] gap-1 border-b">
+          <StatsCard
+            title="Total Projects"
+            label="Projects"
+            color="var(--chart-1)"
+            data={projects}
+            className="border-r"
           />
-        ))}
-      </section>
 
-      <aside className="p-2">
-        <ActivityCard activity={activity} />
-      </aside>
+          <StatsCard
+            title="Featured Projects"
+            label="Featured"
+            color="var(--chart-3)"
+            data={projects.filter((p) => p.featured)}
+            className="border-r"
+          />
+
+          <StatsCard
+            title="Total Categories"
+            label="Categories"
+            color="var(--chart-2)"
+            data={categories}
+          />
+        </section>
+        <div className="flex flex-col gap-4 lg:flex-row divide-y lg:divide-y-0 lg:divide-x">
+          <section className="w-full lg:w-2/3">
+            <TopCategoriesChart data={topCategories} />
+            <FeaturedProjectsTable projects={featuredProjects} />
+          </section>
+
+          <aside className="w-full lg:w-1/3">
+            <ActivityCard activity={activity} />
+          </aside>
+        </div>
+      </ScrollArea>
     </AppContentLayout>
   );
 }

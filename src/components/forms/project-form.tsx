@@ -6,7 +6,8 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
-import { Project, ProjectSchema, Category } from "@/schemas";
+import type { Project, Category } from "@/schemas";
+import { ProjectSchema } from "@/schemas";
 import { upsertProject } from "@/actions/projects";
 import { slugify, cn } from "@/lib/utils";
 

@@ -44,11 +44,11 @@ export enum CategoriesKeys {
 }
 
 export const categoryStyles: Record<CategoriesKeys, string> = {
-  [CategoriesKeys.WEB_DEVELOPMENT]: "bg-indigo-100/30 text-indigo-900 dark:text-indigo-200 border-indigo-200",
-  [CategoriesKeys.DASHBOARD]: "bg-purple-100/30 text-purple-900 dark:text-purple-200 border-purple-200",
-  [CategoriesKeys.LANDING_PAGE]: "bg-pink-100/30 text-pink-900 dark:text-pink-200 border-pink-200",
-  [CategoriesKeys.CMS_TEMPLATE]: "bg-orange-100/30 text-orange-900 dark:text-orange-200 border-orange-200",
-  [CategoriesKeys.ECOMMERCE]: "bg-lime-100/30 text-lime-900 dark:text-lime-200 border-lime-200",
+  [CategoriesKeys.WEB_DEVELOPMENT]: "border-dashed bg-background text-indigo-900 dark:text-indigo-200 border-indigo-200",
+  [CategoriesKeys.DASHBOARD]: "border-dashed bg-background text-purple-900 dark:text-purple-200 border-purple-200",
+  [CategoriesKeys.LANDING_PAGE]: "border-dashed bg-background text-pink-900 dark:text-pink-200 border-pink-200",
+  [CategoriesKeys.CMS_TEMPLATE]: "border-dashed bg-background text-orange-900 dark:text-orange-200 border-orange-200",
+  [CategoriesKeys.ECOMMERCE]: "border-dashed bg-background text-lime-900 dark:text-lime-200 border-lime-200",
 };
 
 

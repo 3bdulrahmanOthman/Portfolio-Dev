@@ -37,11 +37,6 @@ export const dashboardConfig: DashboardConfig = {
           icon: "dashboard",
           active: true,
         },
-        {
-          title: "Inbox",
-          path: "/admin/inbox",
-          icon: "inbox",
-        },
       ],
     },
     {

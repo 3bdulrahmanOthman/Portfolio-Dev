@@ -1,5 +1,6 @@
 import { Icons } from "@/components/icons";
 import { clsx, type ClassValue } from "clsx"
+import { format, subMonths } from "date-fns";
 import { LucideProps } from "lucide-react";
 import { createElement } from "react";
 import { twMerge } from "tailwind-merge"
@@ -55,4 +56,10 @@ export const createSafeAction = <TInput, TOutput>(
 
     return handler(validationResult.data)
   }
+}
+
+export function getLastMonths(count = 6, dateFormat = "MMMM"): string[] {
+  return Array.from({ length: count }, (_, i) =>
+    format(subMonths(new Date(), count - 1 - i), dateFormat)
+  );
 }

@@ -27,28 +27,33 @@ const ActivityCard = ({
       </Card>
     );
   }
+
   const typeColor: Record<string, string> = {
-    project: "bg-indigo-100/10 text-indigo-900 dark:text-indigo-200 border-indigo-200",
-    category: "bg-purple-100/10 text-purple-900 dark:text-purple-200 border-purple-200",
-    about: "bg-pink-100/10 text-pink-900 dark:text-pink-200 border-pink-200",
-    contact: "bg-orange-100/10 text-orange-900 dark:text-orange-200 border-orange-200",
+    project:
+      "border-dashed bg-background text-indigo-900 dark:text-indigo-200 border-indigo-200",
+    category:
+      "border-dashed bg-background text-purple-900 dark:text-purple-200 border-purple-200",
+    about:
+      "border-dashed bg-background text-pink-900 dark:text-pink-200 border-pink-200",
+    contact:
+      "border-dashed bg-background text-orange-900 dark:text-orange-200 border-orange-200",
   };
 
   return (
-    <Card className="border-0 p-0">
-      <CardHeader className="px-2">
+    <Card className="border-0 p-0 gap-4">
+      <CardHeader className="px-2 pt-6">
         <CardTitle>Recent Activity</CardTitle>
         <CardDescription>
           Here you can find the latest changes made to your content.
         </CardDescription>
       </CardHeader>
       <CardContent className="p-0">
-        <ScrollArea className="h-80 px-2">
-          <ul className="space-y-3">
+        <ScrollArea className="h-96 lg:pr-4">
+          <ul className="space-y-3">  
             <React.Suspense
               fallback={
                 <ul className="space-y-3">
-                  {Array.from({ length: 10 }).map((_, i) => (
+                  {Array.from({ length: 5 }).map((_, i) => (
                     <li
                       key={`skeleton-${i}`}
                       className="border p-3 rounded-md flex justify-between items-center"
@@ -72,14 +77,16 @@ const ActivityCard = ({
                 >
                   <div className="flex items-center gap-2">
                     <Badge className={typeColor[item.type]}>{item.type}</Badge>
-                    <p className="font-sm">
-                      {item.action === "created" ? "Created" : "Updated"}{" "}
-                      <span className="capitalize">{item.type}</span>:{" "}
-                      <span className="text-primary">{item.name}</span>
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {formatDistanceToNow(new Date(item.date))} ago
-                    </p>
+                    <div>
+                      <p className="text-sm">
+                        {item.action === "created" ? "Created" : "Updated"}{" "}
+                        <span className="capitalize">{item.type}</span>:{" "}
+                        <span className="text-primary">{item.name}</span>
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {formatDistanceToNow(new Date(item.date))} ago
+                      </p>
+                    </div>
                   </div>
                 </li>
               ))}
