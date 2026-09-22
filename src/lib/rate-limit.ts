@@ -4,7 +4,8 @@ import { UploadThingError } from "uploadthing/server";
 
 type RateLimitContext =
   | "uploader"
-  | "chat";
+  | "chat"
+  | "login";
 
 export async function rateLimit({
   id,

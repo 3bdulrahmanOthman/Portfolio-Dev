@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db/prisma";
+import { auth } from "@/auth";
 import { unstable_cache } from "next/cache";
 
 export type ActivityItem = {
@@ -10,6 +11,14 @@ export type ActivityItem = {
 };
 
 export async function getRecentActivity(): Promise<ActivityItem[]> {
+  // Admin-only read. The guard runs outside unstable_cache: auth() reads
+  // cookies, which is not allowed inside a cache scope.
+  const session = await auth();
+
+  if (session?.user?.role !== "admin") {
+    return [];
+  }
+
   return unstable_cache(
     async () => {
       const [projects, categories, about, contact] = await Promise.all([

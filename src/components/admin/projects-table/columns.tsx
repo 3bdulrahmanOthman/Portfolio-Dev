@@ -28,7 +28,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Category, Project } from "@/schemas";
+import { Category, ProjectWithCategories as Project } from "@/schemas";
 import {
   HoverCard,
   HoverCardContent,

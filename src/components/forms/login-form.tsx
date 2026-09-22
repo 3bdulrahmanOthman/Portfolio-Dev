@@ -39,8 +39,8 @@ export default function SignInForm() {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
-      email: "admin@mail.com",
-      password: "123456",
+      email: "",
+      password: "",
     },
     mode: "onSubmit",
   });

@@ -1,10 +1,13 @@
 import { AxiosError } from "axios";
-import { AuthError } from "next-auth";
-import { isRedirectError } from "next/dist/client/components/redirect-error";
+import { unstable_rethrow } from "next/navigation";
 import { toast } from "sonner";
 import { z } from "zod";
 
 export function getErrorMessage(err: unknown): string {
+  // Rethrows Next.js control-flow errors (redirect/notFound) so they
+  // propagate to the framework instead of being converted into messages.
+  unstable_rethrow(err);
+
   const unknownError = "Something went wrong, please try again later.";
 
   if (err instanceof z.ZodError) {
@@ -21,20 +24,11 @@ export function getErrorMessage(err: unknown): string {
     return err.message;
   }
 
-  if (err instanceof AuthError) {
-    if(err.type === "CredentialsSignin") {
-      return "Invalid credentials!";
-    }
-  }
-
   if (err instanceof Response) {
     return `HTTP Error: ${err.status} - ${err.statusText}`;
   }
   if (typeof err === "string") {
     return err;
-  }
-  if (isRedirectError(err)) {
-    throw err;
   }
 
   return unknownError;

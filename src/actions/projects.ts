@@ -1,6 +1,6 @@
 "use server";
 
-import { Prisma } from "@prisma/client";
+import { Prisma } from "../../generated/prisma/client";
 import { prisma } from "../lib/db/prisma";
 import { revalidatePath } from "next/cache";
 import { createSafeAction, type ActionState } from "@/lib/utils";
@@ -12,6 +12,14 @@ import { subMonths } from "date-fns";
 type ProjectOutput = ActionState<Project, { success: boolean }>;
 
 export async function getProjects(input: GetProjectSchema) {
+  // Admin-only read. The guard runs outside unstable_cache: auth() reads
+  // cookies, which is not allowed inside a cache scope.
+  const session = await auth();
+
+  if (session?.user?.role !== "admin") {
+    return { data: [], pageCount: 0 };
+  }
+
   return await unstable_cache(
     async () => {
       try {
@@ -82,6 +90,12 @@ export async function getProjects(input: GetProjectSchema) {
 }
 
 export async function getFeaturedProjects() {
+  const session = await auth();
+
+  if (session?.user?.role !== "admin") {
+    return [];
+  }
+
   return await unstable_cache(
     async () => {
       return await prisma.project.findMany({
@@ -103,6 +117,12 @@ export async function getFeaturedProjects() {
 
 
 export async function getProjectStats() {
+  const session = await auth();
+
+  if (session?.user?.role !== "admin") {
+    return [];
+  }
+
   const startDate = subMonths(new Date(), 5);
 
   const projects = await prisma.project.findMany({
@@ -210,7 +230,7 @@ export async function updateProjects(data: {
   const session = await auth();
 
   if (!session || session.user?.role !== "admin") {
-    return { error: "Unauthorized", data: null };
+    return { error: "Unauthorized" };
   }
 
   try {
@@ -270,7 +290,7 @@ export async function deleteProject(id: string) {
   const session = await auth();
 
   if (!session || session.user?.role !== "admin") {
-    throw new Error("Unauthorized");
+    return { error: "Unauthorized" };
   }
 
   try {
@@ -294,7 +314,7 @@ export async function deleteProjects(ids: string[]) {
   const session = await auth();
 
   if (!session || session.user?.role !== "admin") {
-    throw new Error("Unauthorized");
+    return { error: "Unauthorized" };
   }
 
   try {

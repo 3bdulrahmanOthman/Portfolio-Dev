@@ -7,7 +7,7 @@ Modern developer portfolio with an integrated dashboard to manage projects, page
 ## 🚀 Tech Stack
 
 ### ✅ Frontend
-- **Framework:** [Next.js 15](https://nextjs.org/)
+- **Framework:** [Next.js 16](https://nextjs.org/)
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/)
 - **UI Components:** [ShadCN UI](https://ui.shadcn.com/)
 - **Forms:** [React Hook Form](https://react-hook-form.com/)
@@ -20,7 +20,7 @@ Modern developer portfolio with an integrated dashboard to manage projects, page
 
 ### 🧠 Backend
 - **ORM:** [Prisma](https://www.prisma.io/)
-- **Database:** PostgreSQL (PlanetScale or other provider)
+- **Database:** PostgreSQL via Prisma Accelerate (edge client)
 - **Routing:** API endpoints via App Router
 - **Server Actions:** Used for all data mutations and interactions
 
@@ -47,9 +47,9 @@ Modern developer portfolio with an integrated dashboard to manage projects, page
 ## ⚙️ Quality & Tooling
 
 - ✅ TypeScript (strict mode)
-- ✅ ESLint & Prettier configured
+- ✅ ESLint 9 (flat config) and CI quality gates (typecheck + lint via GitHub Actions)
 - ✅ Error boundaries and safe API patterns
-- ✅ Prisma schema and migration scripts included
+- ✅ Prisma schema with a generated edge client (migration baseline in progress)
 
 ---
 
@@ -77,14 +77,14 @@ DATABASE_URL=postgresql://your-db-url
 NEXTAUTH_URL="http://localhost:3000"
 AUTH_SECRET="your-secret"
 ADMIN_EMAIL="admin@mail.com"
-ADMIN_PASSWORD="123456"
+NEW_ADMIN_PASSWORD="set-privately-then-run-scripts/rotate-admin-password.ts"
 ```
 
-4. **Run migrations**
+4. **Generate the Prisma client**
 
-```bash
-npx prisma migrate dev
-```
+`pnpm install` runs `prisma generate` automatically via `postinstall`. There is
+no migrations directory yet (baseline planned); the schema in `prisma/schema.prisma`
+is the source of truth.
 
 5. **Start the development server**
 

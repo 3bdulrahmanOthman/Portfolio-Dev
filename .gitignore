@@ -42,3 +42,9 @@ next-env.d.ts
 
 # prisma
 generated/prisma/
+# local artifacts
+portfolio-dev.zip
+.stfolder/
+.sync/
+.serena/
+.zcode/

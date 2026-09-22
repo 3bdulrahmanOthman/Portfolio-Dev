@@ -1,0 +1,30 @@
+ D package-lock.json
+ M package.json
+ M pnpm-lock.yaml
+ M src/app/globals.css
+ D src/app/page.tsx
+ M src/components/icons.tsx
+ M src/types/index.ts
+?? .agents/
+?? .mcp.json
+?? .stfolder/
+?? .sync/
+?? AGENTS.md
+?? CLAUDE.md
+?? portfolio-dev.zip
+?? public/dashboard-dark.webp
+?? public/dashboard-light.webp
+?? src/app/(home)/
+?? src/components/logos/
+?? src/components/main-hero.tsx
+?? src/components/main-nav.tsx
+?? src/components/mobile-nav.tsx
+?? src/components/sections/
+?? src/components/side-header.tsx
+?? src/components/ui/accordion.tsx
+?? src/components/ui/glow.tsx
+?? src/components/ui/mockup.tsx
+?? src/components/ui/navigation-menu.tsx
+?? src/components/ui/screenshot.tsx
+?? src/components/ui/section.tsx
+?? src/config/site.ts

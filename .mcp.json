@@ -1,0 +1,34 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@4.1.1"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@0.0.82"]
+    },
+    "prisma": {
+      "command": "npx",
+      "args": ["-y", "prisma@7.10.0", "mcp"]
+    },
+    "serena": {
+      "command": "C:\\Users\\74\\AppData\\Roaming\\uv\\python\\cpython-3.13.15-windows-x86_64-none\\python.exe",
+      "args": [
+        "C:\\Users\\74\\.local\\bin\\serena-zcode.py",
+        "start-mcp-server",
+        "--context",
+        "agent",
+        "--project",
+        "E:\\portfolio-dev"
+      ]
+    },
+    "github": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "ghcr.io/github/github-mcp-server", "stdio", "--read-only"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+      }
+    }
+  }
+}

@@ -20,7 +20,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { exportTableToCSV } from "@/lib/export";
 import { deleteProjects, updateProjects } from "@/actions/projects";
-import { Category, Project } from "@/schemas";
+import { Category, ProjectWithCategories as Project } from "@/schemas";
 import { Icons } from "@/components/icons";
 
 type Action = "update-featured" | "update-category" | "export" | "delete";
@@ -43,11 +43,11 @@ export function ProjectTableActionBar({
     [isPending, currentAction]
   );
 
-  const onProjectFieldUpdate = <
-    T extends keyof Pick<Project, "featured" | "categories">
-  >(
-    field: T,
-    value: Project[T]
+  // Runtime contract of updateProjects: `featured` takes a boolean,
+  // `categories` takes a single category id.
+  const onProjectFieldUpdate = (
+    field: "featured" | "categories",
+    value: boolean | string
   ) => {
     if (!rows.length) return toast.error("No rows selected");
 
@@ -57,8 +57,10 @@ export function ProjectTableActionBar({
 
     startTransition(() => {
       updateProjects({
-        ids: rows.map((row) => row.original.id as string),
-        [field]: value,
+        ids: rows.map((row) => row.original.id),
+        ...(field === "featured"
+          ? { featured: value as boolean }
+          : { categories: value as string }),
       }).then(({ error }) => {
         if (error) return toast.error(error);
 

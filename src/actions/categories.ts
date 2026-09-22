@@ -1,6 +1,6 @@
 "use server";
 
-import { Prisma } from "@prisma/client";
+import { Prisma } from "../../generated/prisma/client";
 import { revalidatePath } from "next/cache";
 import { prisma } from "../lib/db/prisma";
 import { createSafeAction, type ActionState } from "@/lib/utils";
@@ -15,6 +15,14 @@ type CategoryOutput = ActionState<Category, { success: boolean }>;
  * ✅ Fetch categories with filtering, pagination, sorting
  */
 export async function getCategories(input: GetCategorySchema) {
+  // Admin-only read. The guard runs outside unstable_cache: auth() reads
+  // cookies, which is not allowed inside a cache scope.
+  const session = await auth();
+
+  if (session?.user?.role !== "admin") {
+    return { data: [], pageCount: 0 };
+  }
+
   return await unstable_cache(
     async () => {
       try {
@@ -72,6 +80,12 @@ export async function getCategories(input: GetCategorySchema) {
 }
 
 export async function getCategoryStats() {
+  const session = await auth();
+
+  if (session?.user?.role !== "admin") {
+    return [];
+  }
+
   const startDate = subMonths(new Date(), 5);
 
   const categories = await prisma.category.findMany({
@@ -90,6 +104,12 @@ export async function getCategoryStats() {
 
 
 export async function getTopCategoriesStats() {
+  const session = await auth();
+
+  if (session?.user?.role !== "admin") {
+    return [];
+  }
+
   const startDate = subMonths(new Date(), 6);
 
   const categories = await prisma.category.findMany({
@@ -210,7 +230,7 @@ async function handler(data: Category): Promise<CategoryOutput> {
 export async function deleteCategory(id: string) {
   const session = await auth();
   if (!session || session.user?.role !== "admin") {
-    throw new Error("Unauthorized");
+    return { error: "Unauthorized" };
   }
 
   try {
@@ -233,7 +253,7 @@ export async function deleteCategory(id: string) {
 export async function deleteCategories(ids: string[]) {
   const session = await auth();
   if (!session || session.user?.role !== "admin") {
-    throw new Error("Unauthorized");
+    return { error: "Unauthorized" };
   }
 
   try {

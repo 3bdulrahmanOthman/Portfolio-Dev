@@ -12,9 +12,20 @@ interface NavItem {
   description?: string;
 }
 
+interface FooterItem {
+  title: string
+  items: {
+    title: string
+    path: string
+    external?: boolean
+  }[]
+}
+
 interface NavItemWithChildren extends NavItem {
   items?: NavItemWithChildren[];
 }
+
+type MainNavItem = NavItemWithChildren
 
 type SidebarNavItem = NavItemWithChildren;
 
@@ -25,6 +36,8 @@ interface SearchParams {
 export type {
   NavItem,
   NavItemWithChildren,
+  FooterItem,
+  MainNavItem,
   SidebarNavItem,
   SearchParams,
 };

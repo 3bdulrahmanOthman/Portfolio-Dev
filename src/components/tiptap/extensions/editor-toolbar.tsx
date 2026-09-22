@@ -1,6 +1,7 @@
 "use client";
 
-import { BubbleMenu, type Editor } from "@tiptap/react";
+import { type Editor } from "@tiptap/react";
+import { BubbleMenu } from "@tiptap/react/menus";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { EditorProvider } from "../editor-provider";
@@ -210,7 +211,7 @@ export const EditorToolbar = (props: EditorToolbarProps) => {
       <BubbleMenu
         editor={editor}
         key="mobile-toolbar"
-        tippyOptions={{ duration: 0, placement: "bottom", offset: [0, 10] }}
+        options={{ placement: "bottom", offset: { mainAxis: 10 } }}
         shouldShow={() => editor.isEditable && editor.isFocused}
         className="w-full min-w-full mx-0 shadow-sm border rounded-sm bg-background"
       >

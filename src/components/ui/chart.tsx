@@ -118,8 +118,23 @@ function ChartTooltipContent({
   color,
   nameKey,
   labelKey,
-}: React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
+}: Omit<
+    RechartsPrimitive.TooltipContentProps,
+    | "ref"
+    | "active"
+    | "payload"
+    | "label"
+    | "activeIndex"
+    | "coordinate"
+    | "accessibilityLayer"
+  > &
   React.ComponentProps<"div"> & {
+    // Recharts 3 injects active/payload/label into the tooltip content at
+    // runtime; they are re-declared optional so the content component also
+    // renders standalone as a ReactElement.
+    active?: boolean
+    payload?: RechartsPrimitive.TooltipContentProps["payload"]
+    label?: React.ReactNode
     hideLabel?: boolean
     hideIndicator?: boolean
     indicator?: "line" | "dot" | "dashed"
@@ -186,7 +201,7 @@ function ChartTooltipContent({
 
           return (
             <div
-              key={item.dataKey}
+              key={item.dataKey?.toString()}
               className={cn(
                 "[&>svg]:text-muted-foreground flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5",
                 indicator === "dot" && "items-center"
@@ -256,9 +271,12 @@ function ChartLegendContent({
   payload,
   verticalAlign = "bottom",
   nameKey,
-}: React.ComponentProps<"div"> &
-  Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
+}: React.ComponentProps<"div"> & {
     hideIcon?: boolean
+    // Recharts 3 no longer carries payload on the public Legend props; the
+    // runtime shape matches the tooltip payload entries.
+    payload?: RechartsPrimitive.TooltipContentProps["payload"]
+    verticalAlign?: "top" | "bottom"
     nameKey?: string
   }) {
   const { config } = useChart()
@@ -281,7 +299,7 @@ function ChartLegendContent({
 
         return (
           <div
-            key={item.value}
+            key={item.value?.toString()}
             className={cn(
               "[&>svg]:text-muted-foreground flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3"
             )}

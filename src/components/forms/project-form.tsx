@@ -6,7 +6,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
-import type { Project, Category } from "@/schemas";
+import type { Project, Category, ProjectWithCategories } from "@/schemas";
 import { ProjectSchema } from "@/schemas";
 import { upsertProject } from "@/actions/projects";
 import { slugify, cn } from "@/lib/utils";
@@ -36,7 +36,7 @@ import { StarsBackground } from "@/components/animate-ui/stars-background";
 import { SelectOption } from "../select-option";
 
 interface ProjectFormProps {
-  initialData?: Project;
+  initialData?: ProjectWithCategories;
   initialCatData: Category[];
 }
 
@@ -93,7 +93,7 @@ export default function ProjectForm({
       if (result.fieldErrors) {
         for (const [field, errors] of Object.entries(result.fieldErrors)) {
           if (errors?.length) {
-            form.setError(field, {
+            form.setError(field as keyof Project, {
               type: "manual",
               message: errors[0],
             });

@@ -39,6 +39,7 @@ import {
   Maximize,
   ListTree,
   Sparkles,
+  Menu,
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -82,6 +83,7 @@ export const Icons = {
   maximize: Maximize,
   listTree: ListTree,
   sparkles: Sparkles,
+  menu: Menu,
   logo: ({ ...props }: LucideProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"

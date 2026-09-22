@@ -19,9 +19,19 @@ export default {
 
         const { email, password } = validatedFields.data;
 
+        // Bcrypt hash of a discarded random string (not a credential). It
+        // equalizes the cost of the "unknown email" path with the
+        // "wrong password" path so response timing cannot be used to
+        // enumerate registered accounts.
+        const DUMMY_HASH =
+          "$2b$12$8QrKo9o7pd5dDisTk7Zh/.KtZ4l1Oxi95S5nEySOLwr2yrue8vxhC";
+
         const user = await getUserByEmail(email);
 
-        if (!user || !user.email || !user.password) return null;
+        if (!user || !user.email || !user.password) {
+          await compare(password, DUMMY_HASH);
+          return null;
+        }
 
         const isPasswordValid = await compare(password, user.password);
 

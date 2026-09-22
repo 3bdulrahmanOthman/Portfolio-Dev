@@ -60,6 +60,10 @@ declare module "@tiptap/core" {
       setRegexMode: (disableRegex: boolean) => ReturnType
     }
   }
+
+  interface Storage {
+    searchAndReplace: SearchAndReplaceStorage
+  }
 }
 
 /**

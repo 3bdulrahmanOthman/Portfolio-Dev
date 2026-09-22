@@ -4,7 +4,7 @@ import { SearchParams } from "@/types";
 import { getValidFilters } from "@/lib/data-table";
 import { categorySearchParamsCache } from "@/schemas";
 import { getCategories } from "@/actions/categories";
-import { CategoriesTable } from "@/components/admin/catagories-table";
+import { CategoriesTable } from "@/components/admin/categories-table";
 
 interface IndexPageProps {
   searchParams: Promise<SearchParams>;

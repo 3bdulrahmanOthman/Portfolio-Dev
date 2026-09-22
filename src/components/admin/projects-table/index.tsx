@@ -15,7 +15,7 @@ import AppContentLayout from "../content-layout";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
 import { useRouter } from "next/navigation";
-import { Project } from "@/schemas";
+import { ProjectWithCategories as Project } from "@/schemas";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { getCategories } from "@/actions/categories";
 

@@ -3,9 +3,19 @@ import {
   createSearchParamsCache,
   parseAsArrayOf,
   parseAsInteger,
+  parseAsFloat,
   parseAsString,
+  parseAsStringLiteral,
 } from "nuqs/server";
 import { getFiltersStateParser, getSortingStateParser } from "@/lib/parsers";
+import type { Prisma } from "../../generated/prisma/client";
+
+// Row shape actually returned by the data layer (project with its categories
+// loaded via Prisma `include`). Distinct from the form payload (ProjectSchema),
+// whose `categories` are category ids.
+export type ProjectWithCategories = Prisma.ProjectGetPayload<{
+  include: { categories: true };
+}>;
 
 export const LoginSchema = z.object({
   email: z.string().email({
@@ -97,7 +107,7 @@ export const ContactSchema = z.object({
 
 export type Contact = z.infer<typeof ContactSchema>;
 
-export const ProjectSchema: z.ZodType = z.lazy(() =>
+export const ProjectSchema = z.lazy(() =>
   z.object({
     id: z.string().optional(),
     title: z.string().min(1, "Title is required"),
@@ -130,7 +140,7 @@ export type Category = z.infer<typeof CategorySchema>;
 const baseSearchParams = {
   page: parseAsInteger.withDefault(1),
   perPage: parseAsInteger.withDefault(10),
-  createdAt: parseAsArrayOf(z.coerce.number()).withDefault([]),
+  createdAt: parseAsArrayOf(parseAsFloat).withDefault([]),
   filters: getFiltersStateParser().withDefault([]),
 };
 
@@ -140,8 +150,10 @@ export const projectSearchParamsCache = createSearchParamsCache({
     { id: "createdAt", desc: true },
   ]),
   title: parseAsString.withDefault(""),
-  featured: parseAsArrayOf(z.enum(["featured", "standard"])).withDefault([]),
-  categories: parseAsArrayOf(z.string()).withDefault([]),
+  featured: parseAsArrayOf(
+    parseAsStringLiteral(["featured", "standard"])
+  ).withDefault([]),
+  categories: parseAsArrayOf(parseAsString).withDefault([]),
 });
 
 export type GetProjectSchema = Awaited<
@@ -154,7 +166,7 @@ export const categorySearchParamsCache = createSearchParamsCache({
     { id: "createdAt", desc: true },
   ]),
   name: parseAsString.withDefault(""),
-  projects: parseAsArrayOf(z.string()).withDefault([]),
+  projects: parseAsArrayOf(parseAsString).withDefault([]),
 });
 
 export type GetCategorySchema = Awaited<
